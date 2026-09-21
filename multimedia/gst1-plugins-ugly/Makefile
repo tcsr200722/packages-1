@@ -8,20 +8,18 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=gst1-plugins-ugly
-PKG_VERSION:=1.18.4
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=1.26.4
+PKG_RELEASE:=1
 
 PKG_SOURCE:=gst-plugins-ugly-$(PKG_VERSION).tar.xz
 PKG_SOURCE_URL:=https://gstreamer.freedesktop.org/src/gst-plugins-ugly
-PKG_HASH:=218df0ce0d31e8ca9cdeb01a3b0c573172cc9c21bb3d41811c7820145623d13c
+PKG_HASH:=a0c8b744d257c0937c7ee6f9caefb116db80ab7c5ac882b50b6bf08f9aeb57ce
 PKG_BUILD_DIR:=$(BUILD_DIR)/gst-plugins-ugly-$(PKG_VERSION)
 
 PKG_MAINTAINER:=W. Michael Petullo <mike@flyn.org> \
 		Ted Hess <thess@kitschensync.net>
 PKG_LICENSE:=LGPL-2.1-or-later
 PKG_LICENSE_FILES:=COPYING
-
-PKG_INSTALL:=1
 
 include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/nls.mk
@@ -97,17 +95,15 @@ MESON_ARGS += \
 	-Ddvdlpcmdec=disabled \
 	-Ddvdsub=disabled \
 	-Drealmedia=disabled \
-	-Dxingmux=disabled \
 	\
 	-Da52dec=disabled \
-	-Damrnb=disabled \
-	-Damrwbdec=disabled \
 	-Dcdio=disabled \
 	-Ddvdread=disabled \
 	$(call GST_COND_SELECT,mpeg2dec) \
 	-Dsidplay=disabled \
 	-Dx264=disabled \
 	\
+	-Dgpl=enabled \
 	-Dnls=enabled \
 	-Dorc=disabled \
 	-Dtests=disabled \

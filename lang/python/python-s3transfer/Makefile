@@ -1,14 +1,15 @@
 include $(TOPDIR)/rules.mk
 
-PKG_NAME:=s3transfer
-PKG_VERSION:=0.2.0
-PKG_RELEASE:=2
+PKG_NAME:=python-s3transfer
+PKG_VERSION:=0.19.2
+PKG_RELEASE:=1
 
-PYPI_NAME:=$(PKG_NAME)
-PKG_HASH:=f23d5cb7d862b104401d9021fc82e5fa0e0cf57b7660a1331425aab0c691d021
+PYPI_NAME:=s3transfer
+PKG_HASH:=ba0309fd86be3c27dbf78cdd813c13c5e1df16e5874b99d2535ebbdfb9892993
 
-PKG_MAINTAINER:=Daniel Danzberger <daniel@dd-wrt.com>
-PKG_LICENSE:=MIT
+PKG_MAINTAINER:=Alexandru Ardelean <ardeleanalex@gmail.com>
+PKG_LICENSE:=Apache-2.0
+PKG_LICENSE_FILES:=LICENSE.txt
 
 include ../pypi.mk
 include $(INCLUDE_DIR)/package.mk
@@ -18,10 +19,12 @@ define Package/python3-s3transfer
   SECTION:=lang
   CATEGORY:=Languages
   SUBMENU:=Python
-  TITLE:=s3transfer
+  TITLE:=Amazon S3 Transfer Manager
   URL:=https://github.com/boto/s3transfer
   DEPENDS:= \
-	+python3 \
+	+python3-light \
+	+python3-logging \
+	+python3-multiprocessing \
 	+python3-botocore
 endef
 

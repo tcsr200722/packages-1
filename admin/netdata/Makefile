@@ -8,29 +8,32 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=netdata
-PKG_VERSION:=1.30.1
-PKG_RELEASE:=1
+PKG_VERSION:=1.38.1
+PKG_RELEASE:=5
 
 PKG_MAINTAINER:=Josef Schlehofer <pepe.schlehofer@gmail.com>, Daniel Engberg <daniel.engberg.lists@pyret.net>
 PKG_LICENSE:=GPL-3.0-or-later
 PKG_LICENSE_FILES:=COPYING
-PKG_CPE_ID:=cpe:/a:my-netdata:netdata
+PKG_CPE_ID:=cpe:/a:netdata:netdata
 
 PKG_SOURCE:=$(PKG_NAME)-v$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://codeload.github.com/netdata/netdata/tar.gz/v$(PKG_VERSION)?
-PKG_HASH:=e05f8b59d283fb2844280455b9481a2f9104730fd77f535312ff2fec40a6bc11
+PKG_SOURCE_URL:=https://github.com/netdata/netdata/releases/download/v$(PKG_VERSION)
+PKG_HASH:=e32a5427f0c00550210dbbf0046c2621313955256edf836db686e2bc270b8d10
+PKG_BUILD_DIR=$(BUILD_DIR)/$(PKG_NAME)-v$(PKG_VERSION)
 
 PKG_INSTALL:=1
 PKG_BUILD_PARALLEL:=1
+PKG_BUILD_DEPENDS:=protobuf-compat/host
 PKG_FIXUP:=autoreconf
-PKG_USE_MIPS16:=0
+PKG_BUILD_FLAGS:=no-mips16 gc-sections
 
 include $(INCLUDE_DIR)/package.mk
 
 define Package/netdata
   SECTION:=admin
   CATEGORY:=Administration
-  DEPENDS:=+zlib +libuuid +libuv +libmnl +libjson-c
+  DEPENDS:=+zlib +libuuid +libuv +libmnl +libjson-c +libopenssl \
+    +libstdcpp +libatomic +protobuf-compat +openssl-util +curl +bash
   TITLE:=Real-time performance monitoring tool
   URL:=https://www.netdata.cloud/
 endef
@@ -43,9 +46,7 @@ define Package/netdata/description
   python3-urllib3
 endef
 
-TARGET_CFLAGS := $(filter-out -O%,$(TARGET_CFLAGS))
-TARGET_CFLAGS += -ffunction-sections -fdata-sections -O3
-TARGET_LDFLAGS += -Wl,--gc-sections
+TARGET_CFLAGS := $(filter-out -O%,$(TARGET_CFLAGS)) -O3 -std=gnu17
 
 CONFIGURE_ARGS += \
 	--with-zlib \
@@ -54,15 +55,26 @@ CONFIGURE_ARGS += \
 	--enable-lto \
 	--disable-ebpf \
 	--without-libcap \
-	--disable-https \
 	--disable-dbengine \
+	--disable-compression \
 	--disable-plugin-nfacct \
 	--disable-plugin-freeipmi \
 	--disable-plugin-cups \
 	--disable-plugin-xenstat \
-	--disable-backend-prometheus-remote-write \
+	--disable-exporting-prometheus-remote-write \
 	--disable-unit-tests \
-	--disable-cloud
+	--disable-ml
+
+CONFIGURE_VARS += \
+	PKG_CONFIG_PATH="$(STAGING_DIR)/usr/protobuf-compat/lib/pkgconfig:$(PKG_CONFIG_PATH)" \
+	CPPFLAGS="-I$(STAGING_DIR)/usr/protobuf-compat/include $(TARGET_CPPFLAGS)" \
+	CXXFLAGS="-I$(STAGING_DIR)/usr/protobuf-compat/include $(TARGET_CXXFLAGS)" \
+	LDFLAGS="-L$(STAGING_DIR)/usr/protobuf-compat/lib $(TARGET_LDFLAGS)"
+
+define Build/Configure
+	$(SED) 's/m4_esyscmd(\[git describe .*\])/$(PKG_VERSION)/' $(PKG_BUILD_DIR)/configure.ac
+	$(Build/Configure/Default)
+endef
 
 define Package/netdata/conffiles
 /etc/netdata/
@@ -75,11 +87,12 @@ define Package/netdata/install
 	touch $(1)/etc/netdata/.opt-out-from-anonymous-statistics
 	$(INSTALL_DIR) $(1)/usr/lib
 	$(CP) $(PKG_INSTALL_DIR)/usr/lib/netdata $(1)/usr/lib
-	$(CP) $(1)/usr/lib/netdata/conf.d/fping.conf $(1)/etc
 	$(CP) $(1)/usr/lib/netdata/conf.d/health_alarm_notify.conf $(1)/etc
 	$(CP) $(1)/usr/lib/netdata/plugins.d/tc-qos-helper.sh $(1)/etc
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/sbin/netdata $(1)/usr/sbin
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/sbin/netdatacli $(1)/usr/sbin
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/sbin/netdata-claim.sh $(1)/usr/sbin
 	$(INSTALL_DIR) $(1)/usr/share/netdata
 	$(CP) $(PKG_INSTALL_DIR)/usr/share/netdata $(1)/usr/share
 	rm $(1)/usr/share/netdata/web/demo*html

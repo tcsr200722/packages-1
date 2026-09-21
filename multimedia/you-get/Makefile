@@ -5,11 +5,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=you-get
-PKG_VERSION:=0.4.1545
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=0.4.1718
+PKG_RELEASE:=2
 
 PYPI_NAME:=you-get
-PKG_HASH:=63e9b0527424c565303fe3d8ede1cd35d48a4ecf4afe72e1c12b0e90b9fdcd39
+PYPI_SOURCE_NAME:=you_get
+PKG_HASH:=78560236a4d54ad6be200d172a828e39f49c0f07c867dcf1df670c66b5b7f096
 
 PKG_MAINTAINER:=Tianling Shen <cnsztl@immortalwrt.org>
 PKG_LICENSE:=MIT
@@ -28,11 +29,11 @@ define Package/you-get
     +ca-certificates \
     +ffmpeg \
     +python3 \
-    +python3-email \
     +python3-xml \
     +python3-codecs \
     +python3-ctypes \
-    +python3-setuptools
+    +python3-setuptools \
+    +python3-urllib
 endef
 
 define Package/you-get/description

@@ -8,14 +8,14 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=fio
-PKG_VERSION:=3.24
+PKG_VERSION:=3.42
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
-PKG_SOURCE_URL:=http://brick.kernel.dk/snaps
-PKG_HASH:=b66fe29ad0047c347e9c21090ff1b37a882fa1041bcc3a6f8501d47db15f5063
+PKG_SOURCE_URL:=https://brick.kernel.dk/snaps
+PKG_HASH:=ac126c69fde515a3da3f71817562715df9001e79f2008ed98a17eac340cd3f66
 
-PKG_MAINTAINER:=
+PKG_MAINTAINER:=Alexandru Ardelean <ardeleanalex@gmail.com>
 PKG_LICENSE:=GPL-2.0-or-later
 PKG_LICENSE_FILES:=COPYING
 
@@ -28,7 +28,7 @@ define Package/fio
   SECTION:=utils
   CATEGORY:=Utilities
   SUBMENU:=Disc
-  DEPENDS:=+libaio +zlib
+  DEPENDS:=+libaio +zlib +libatomic
   TITLE:=I/O testing and benchmarking tool
   URL:=https://github.com/axboe/fio
 endef
@@ -41,7 +41,7 @@ define Package/fio/description
 endef
 
 TARGET_CFLAGS := $(filter-out -O%,$(TARGET_CFLAGS))
-TARGET_LDFLAGS += -Wl,--gc-sections
+TARGET_LDFLAGS += -Wl,--gc-sections -latomic
 
 CONFIGURE_ARGS = \
 	--disable-numa \
@@ -59,6 +59,11 @@ CONFIGURE_ARGS = \
 	--cc="$(TARGET_CC)" \
 	--extra-cflags="$(TARGET_CFLAGS)" \
 	--prefix="$(CONFIGURE_PREFIX)"
+
+define Build/Prepare
+	$(call Build/Prepare/Default)
+	$(SED) '/#include <linux\/prctl.h>/d' $(PKG_BUILD_DIR)/backend.c
+endef
 
 define Package/fio/install
 	$(INSTALL_DIR) $(1)/usr/bin

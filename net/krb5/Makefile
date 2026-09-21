@@ -8,22 +8,22 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=krb5
-PKG_VERSION:=1.19.1
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=1.22.2
+PKG_RELEASE:=1
 
 PKG_MAINTAINER:=W. Michael Petullo <mike@flyn.org>
 
 PKG_LICENSE:=MIT
 PKG_LICENSE_FILES:=NOTICE
-PKG_CPE_ID:=cpe:/a:mit:kerberos
+PKG_CPE_ID:=cpe:/a:mit:kerberos_5
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://web.mit.edu/kerberos/dist/krb5/1.19
-PKG_HASH:=fa16f87eb7e3ec3586143c800d7eaff98b5e0dcdf0772af7d98612e49dbeb20b
+PKG_SOURCE_URL:=https://web.mit.edu/kerberos/dist/krb5/1.22
+PKG_HASH:=3243ffbc8ea4d4ac22ddc7dd2a1dc54c57874c40648b60ff97009763554eaf13
 
 PKG_BUILD_PARALLEL:=1
 PKG_INSTALL:=1
-PKG_USE_MIPS16:=0
+PKG_BUILD_FLAGS:=no-mips16
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -42,7 +42,7 @@ define Package/krb5-libs
 	TITLE:=Kerberos
 	DEPENDS:=+libncurses +libss +libcomerr
 	TITLE:=Kerberos 5 Shared Libraries
-	URL:=http://web.mit.edu/kerberos/
+	URL:=https://web.mit.edu/kerberos/
 endef
 
 define Package/krb5-server

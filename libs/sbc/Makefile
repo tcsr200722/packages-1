@@ -8,20 +8,21 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=sbc
-PKG_VERSION:=1.5
+PKG_VERSION:=2.2
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
 PKG_SOURCE_URL:=@KERNEL/linux/bluetooth/
-PKG_HASH:=0cbad69823a99e8421fe0700e8cf9eeb8fa0c1ad28e8dbc2182b3353507931d2
+PKG_HASH:=a1ada76ef35e5af9c2fbd063754dc9e37a8d989417c6eb1ecebb089b1383ae9e
 
 PKG_LICENSE:=LGPL-2.1-or-later
 PKG_LICENSE_FILES:=COPYING.LIB
-PKG_MAINTAINER:=
+PKG_MAINTAINER:=Alexandru Ardelean <ardeleanalex@gmail.com>
 
 PKG_FIXUP:=autoreconf
 PKG_INSTALL:=1
 PKG_BUILD_PARALLEL:=1
+PKG_BUILD_FLAGS:=lto
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -30,16 +31,13 @@ define Package/sbc
   CATEGORY:=Libraries
   TITLE:=sbc encoding library
   DEPENDS:=+libsndfile
-  URL:=http://www.bluez.org
+  URL:=https://www.bluez.org
 endef
 
 define Package/sbc/description
   Low Complexity Subband Coding for bluetooth audio profiles encoding and decoding.
   Needed for A2DP support.
 endef
-
-TARGET_CFLAGS += -flto
-TARGET_LDFLAGS += -flto
 
 define Build/InstallDev
 	$(INSTALL_DIR) $(1)/usr/include/sbc

@@ -8,17 +8,18 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=python-pytest-forked
-PKG_VERSION:=1.3.0
-PKG_RELEASE:=2
+PKG_VERSION:=1.7.5
+PKG_RELEASE:=1
 
 PYPI_NAME:=pytest-forked
-PKG_HASH:=6aa9ac7e00ad1a539c41bec6d21011332de671e938c7637378ec9710204e37ca
+PYPI_SOURCE_NAME:=pytest_forked
+PKG_HASH:=00f2bee51612f29b8e6b81eed2c3b2975e824c2693394f5bdaf7a1369078ba5f
 
-PKG_MAINTAINER:=Jan Pavlinec <jan.pavlinec1@gmail.com>
+PKG_MAINTAINER:=Alexandru Ardelean <ardeleanalex@gmail.com>
 PKG_LICENSE:=MIT
 PKG_LICENSE_FILES:=LICENSE
 
-HOST_PYTHON3_PACKAGE_BUILD_DEPENDS:=setuptools-scm
+PKG_BUILD_DEPENDS:=python-setuptools-scm/host
 
 include ../pypi.mk
 include $(INCLUDE_DIR)/package.mk

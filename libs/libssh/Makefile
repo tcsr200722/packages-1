@@ -8,21 +8,21 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libssh
-PKG_VERSION:=0.9.6
-PKG_RELEASE:=1
+PKG_VERSION:=0.12.2
+PKG_RELEASE:=2
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
-PKG_SOURCE_URL:=https://www.libssh.org/files/0.9/
-PKG_HASH:=86bcf885bd9b80466fe0e05453c58b877df61afa8ba947a58c356d7f0fab829b
+PKG_SOURCE_URL:=https://www.libssh.org/files/0.12/
+PKG_HASH:=49560f677d96e3706a904ac2de1116e25f3680937d51e5c92198fcba4a1c1e9f
 
-PKG_MAINTAINER:=Mislav Novakovic <mislav.novakovic@sartura.hr>
+PKG_MAINTAINER:=Alexandru Ardelean <ardeleanalex@gmail.com>
 PKG_LICENSE:=LGPL-2.1-or-later BSD-2-Clause
 PKG_LICENSE_FILES:=COPYING
 PKG_CPE_ID:=cpe:/a:libssh:libssh
 
 CMAKE_INSTALL:=1
 CMAKE_BINARY_SUBDIR:=build
-PKG_USE_MIPS16:=0
+PKG_BUILD_FLAGS:=no-mips16
 
 include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/cmake.mk
@@ -59,6 +59,12 @@ CMAKE_OPTIONS += \
 	-UWITH_STACK_PROTECTOR_STRONG \
 	-DWITH_STACK_PROTECTOR_STRONG=0 \
 	-DHAVE_WORDS_BIGENDIAN=$(if $(CONFIG_BIG_ENDIAN),1,0)
+
+define Build/InstallDev
+	$(call Build/InstallDev/cmake,$(1))
+	$(SED) 's,/usr/include,$$$${prefix}/include,g' $(1)/usr/lib/pkgconfig/libssh.pc
+	$(SED) 's,/usr/lib,$$$${exec_prefix}/lib,g' $(1)/usr/lib/pkgconfig/libssh.pc
+endef
 
 define Package/libssh/install
 	$(INSTALL_DIR) $(1)/usr/lib

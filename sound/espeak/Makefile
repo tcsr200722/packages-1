@@ -7,28 +7,29 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=espeak
 PKG_VERSION:=1.48.04
-PKG_RELEASE:=3
+PKG_RELEASE:=5
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-source.zip
 PKG_SOURCE_URL:=@SF/espeak
 PKG_HASH:=bf9a17673adffcc28ff7ea18764f06136547e97bbd9edf2ec612f09b207f0659
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)-source
 
-PKG_MAINTAINER:=
+PKG_MAINTAINER:=Alexandru Ardelean <ardeleanalex@gmail.com>
 PKG_LICENSE:=GPL-3.0-or-later
 PKG_LICENSE_FILES:=License.txt
 
 PKG_INSTALL:=1
 PKG_BUILD_PARALLEL:=1
+PKG_BUILD_FLAGS:=gc-sections lto
 
 include $(INCLUDE_DIR)/package.mk
 
 define Package/espeak
   SECTION:=sound
   CATEGORY:=Sound
-  DEPENDS:=+libstdcpp +portaudio
+  DEPENDS:=+portaudio
   TITLE:=Speech synthesizer
-  URL:=http://espeak.sourceforge.net/
+  URL:=https://espeak.sourceforge.net/
 endef
 
 define Package/espeak/description
@@ -50,8 +51,8 @@ MAKE_FLAGS+= \
 
 MAKE_PATH:=./src
 
-TARGET_CXXFLAGS += -std=c++14 -ffunction-sections -fdata-sections -flto
-TARGET_LDFLAGS += $(FPIC) $(if $(CONFIG_USE_GLIBC),-lm) -Wl,--gc-sections,--as-needed
+TARGET_CXXFLAGS += -std=c++14
+TARGET_LDFLAGS += $(FPIC) -Wl,--as-needed
 
 define Package/espeak/install
 	$(INSTALL_DIR) $(1)/usr/bin

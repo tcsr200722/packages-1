@@ -5,12 +5,17 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=python-schema
-PKG_VERSION:=0.7.2
-PKG_RELEASE:=1
-PKG_MAINTAINER:=Karel Kočí <cynerd@email.cz>
+PKG_VERSION:=0.7.8
+PKG_RELEASE:=2
+PKG_MAINTAINER:=Josef Schlehofer <pepe.schlehofer@gmail.com> 
 
 PYPI_NAME:=schema
-PKG_HASH:=b536f2375b49fdf56f36279addae98bd86a8afbd58b3c32ce363c464bed5fc1c
+PKG_HASH:=e86cc08edd6fe6e2522648f4e47e3a31920a76e82cce8937535422e310862ab5
+
+PKG_LICENSE:=MIT
+PKG_LICENSE_FILES:=LICENSE-MIT
+
+PKG_BUILD_DEPENDS:=python-setuptools/host
 
 include ../pypi.mk
 include $(INCLUDE_DIR)/package.mk
@@ -21,12 +26,15 @@ define Package/python3-schema
   CATEGORY:=Languages
   SUBMENU:=Python
   URL:=https://github.com/keleshev/schema
-  TITLE:=python3-schema
-  DEPENDS:=+python3-light +python3-contextlib2
+  TITLE:=Simple data validation library
+  DEPENDS:=+python3-light
 endef
 
 define Package/python3-schema/description
-  Schema validation just got Pythonic
+schema is a library for validating Python data structures, such as those
+obtained from config-files, forms, external services or command-line
+parsing, converted from JSON/YAML (or something else) to Python
+data-types.
 endef
 
 $(eval $(call Py3Package,python3-schema))

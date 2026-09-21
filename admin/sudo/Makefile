@@ -8,29 +8,38 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=sudo
-PKG_VERSION:=1.9.8p2
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_REALVERSION:=1.9.17p2
+PKG_VERSION:=$(subst p,_p,$(PKG_REALVERSION))
+PKG_RELEASE:=3
 
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_REALVERSION).tar.gz
 PKG_SOURCE_URL:=https://www.sudo.ws/dist
-PKG_HASH:=9e3b8b8da7def43b6e60c257abe80467205670fd0f7c081de1423c414b680f2d
+PKG_HASH:=4a38a1ab3adb1199257edc2a7c4a2bd714665eb605b04368843b06dada2cfcfb
+PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_REALVERSION)
 
 PKG_MAINTAINER:=Alexandru Ardelean <ardeleanalex@gmail.com>
 
 PKG_LICENSE:=ISC
-PKG_LICENSE_FILES:=doc/LICENSE
-PKG_CPE_ID:=cpe:/a:todd_miller:sudo
+PKG_LICENSE_FILES:=LICENSE.md
+PKG_CPE_ID:=cpe:/a:sudo_project:sudo
 
 PKG_INSTALL:=1
 PKG_BUILD_PARALLEL:=1
+PKG_BUILD_FLAGS:=no-mips16
 
 include $(INCLUDE_DIR)/package.mk
+
+# Skip the install-time chown, which fails during the unprivileged staged
+# install; sudo propagates INSTALL_OWNER into every sub-make.
+MAKE_INSTALL_FLAGS += INSTALL_OWNER=
 
 define Package/sudo
   SECTION:=admin
   CATEGORY:=Administration
   TITLE:=Delegate authority to run commands
   URL:=https://www.sudo.ws/
+  USERID:=:sudo
+  DEPENDS:= +USE_GLIBC:libcrypt-compat
 endef
 
 define Package/sudo/description

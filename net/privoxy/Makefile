@@ -8,13 +8,14 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=privoxy
-PKG_VERSION:=3.0.28
-PKG_RELEASE:=1
+PKG_VERSION:=4.1.0
+PKG_REAL_VERSION:=$(PKG_VERSION)-stable
+PKG_RELEASE:=2
 
-PKG_SOURCE:=privoxy-$(PKG_VERSION)-stable-src.tar.gz
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-stable-src.tar.gz
 PKG_SOURCE_URL:=@SF/ijbswa
-PKG_HASH:=b5d78cc036aaadb3b7cf860e9d598d7332af468926a26e2d56167f1cb6f2824a
-PKG_BUILD_DIR:=$(BUILD_DIR)/privoxy-$(PKG_VERSION)-stable
+PKG_HASH:=23e4686e5848c74cb680c09c2811f0357739ecfe641f9c4072ee42399092c97b
+PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_REAL_VERSION)
 PKG_FIXUP:=autoreconf
 PKG_INSTALL:=1
 
@@ -22,7 +23,7 @@ PKG_LICENSE:=GPL-2.0
 PKG_LICENSE_FILES:=LICENSE
 PKG_CPE_ID:=cpe:/a:privoxy:privoxy
 
-PKG_MAINTAINER:=
+PKG_MAINTAINER:=Alexandru Ardelean <ardeleanalex@gmail.com>
 
 PKG_CONFIG_DEPENDS:= \
   CONFIG_IPV6 \
@@ -46,7 +47,8 @@ PKG_CONFIG_DEPENDS:= \
   CONFIG_PRIVOXY_enable-external-filters \
   CONFIG_PRIVOXY_enable-accept-filter \
   CONFIG_PRIVOXY_enable-strptime-sanity-checks \
-  CONFIG_PRIVOXY_enable-compression
+  CONFIG_PRIVOXY_enable-compression \
+  CONFIG_PRIVOXY_enable-https-inspection
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -55,10 +57,10 @@ define Package/privoxy
   CATEGORY:=Network
   SUBMENU:=Web Servers/Proxies
   TITLE:=Privoxy WEB Proxy
-  URL:=http://www.privoxy.org/
+  URL:=https://www.privoxy.org/
   USERID:=privoxy=8118:privoxy=8118
   MENU:=1
-  DEPENDS:=+!PRIVOXY_no_pcre:libpcre +!PRIVOXY_no_pthread:libpthread +!PRIVOXY_no_zlib:zlib
+  DEPENDS:=+!PRIVOXY_no_pcre:libpcre2 +!PRIVOXY_no_pthread:libpthread +!PRIVOXY_no_zlib:zlib +!PRIVOXY_no_openssl:libopenssl
 endef
 
 # shown in LuCI package description
@@ -71,9 +73,9 @@ define Package/privoxy/config
 	help
 		Privoxy is a web proxy with advanced filtering capabilities for protecting
 		privacy, modifying web page content, managing cookies, controlling access,
-		and removing ads, banners, pop-ups and other obnoxious Internet junk. 
+		and removing ads, banners, pop-ups and other obnoxious Internet junk.
 		Privoxy has a very flexible configuration and can be customized to suit
-		individual needs and tastes. 
+		individual needs and tastes.
 		Privoxy has application for both stand-alone systems and multi-user networks.
 		Run as : $(USERID)
 		Version: $(PKG_VERSION)-$(PKG_RELEASE)
@@ -105,7 +107,8 @@ CONFIGURE_ARGS += \
 	$(if $(CONFIG_PRIVOXY_enable-external-filters),--enable-external-filters) \
 	$(if $(CONFIG_PRIVOXY_enable-accept-filter),--enable-accept-filter) \
 	$(if $(CONFIG_PRIVOXY_enable-strptime-sanity-checks),--enable-strptime-sanity-checks) \
-	$(if $(CONFIG_PRIVOXY_enable-compression),--enable-compression)
+	$(if $(CONFIG_PRIVOXY_enable-compression),--enable-compression) \
+	$(if $(CONFIG_PRIVOXY_enable-https-inspection),--with-openssl)
 
 # needed otherwise errors during compile
 MAKE_FLAGS:=
@@ -118,13 +121,13 @@ define Package/privoxy/conffiles
 endef
 
 define Package/privoxy/preinst
-	#!/bin/sh
-	[ -n "$${IPKG_INSTROOT}" ] && exit 0	# if run within buildroot exit
+#!/bin/sh
+[ -n "$${IPKG_INSTROOT}" ] && exit 0	# if run within buildroot exit
 
-	# stop service if PKG_UPGRADE
-	[ "$${PKG_UPGRADE}" = "1" ] && /etc/init.d/privoxy stop >/dev/null 2>&1
-		
-	exit 0	# suppress errors from stop command
+# stop service if PKG_UPGRADE
+[ "$${PKG_UPGRADE}" = "1" ] && /etc/init.d/privoxy stop >/dev/null 2>&1
+
+exit 0	# suppress errors from stop command
 endef
 
 define Package/privoxy/install
@@ -156,9 +159,16 @@ define Package/privoxy/install
 endef
 
 define Package/privoxy/postinst
-	#!/bin/sh
-	grep -i privoxy $${IPKG_INSTROOT}/etc/services >/dev/null 2>&1 || \
-		echo -e "privoxy\t8118" >> $${IPKG_INSTROOT}/etc/services
+#!/bin/sh
+# if exists, update previous version entry missing protocol
+(grep -E "privoxy.*8118$$" $${IPKG_INSTROOT}/etc/services) > /dev/null \
+	&& sed -i "s/privoxy.*8118/privoxy\t\t8118\/tcp/" $${IPKG_INSTROOT}/etc/services
+
+# add missing tcp and udp entries
+(grep -E "privoxy.*8118\/tcp" $${IPKG_INSTROOT}/etc/services) > /dev/null \
+	|| echo -e "privoxy\t\t8118/tcp" >> $${IPKG_INSTROOT}/etc/services
+(grep -E "privoxy.*8118\/udp" $${IPKG_INSTROOT}/etc/services) > /dev/null \
+	|| echo -e "privoxy\t\t8118/udp" >> $${IPKG_INSTROOT}/etc/services
 endef
 
 $(eval $(call BuildPackage,privoxy))

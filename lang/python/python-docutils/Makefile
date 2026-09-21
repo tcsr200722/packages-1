@@ -1,14 +1,15 @@
 include $(TOPDIR)/rules.mk
 
-PKG_NAME:=docutils
-PKG_VERSION:=0.14
+PKG_NAME:=python-docutils
+PKG_VERSION:=0.23
 PKG_RELEASE:=2
 
-PYPI_NAME:=$(PKG_NAME)
-PKG_HASH:=51e64ef2ebfb29cae1faa133b3710143496eca21c530f3f71424d77687764274
+PYPI_NAME:=docutils
+PKG_HASH:=746f5060322511280a1e50eb76846ed6bf2342984b2ac04dc42caa1a8d78799e
 
-PKG_MAINTAINER:=Daniel Danzberger <daniel@dd-wrt.com>
-PKG_LICENSE:=MIT
+PKG_MAINTAINER:=Alexandru Ardelean <ardeleanalex@gmail.com>
+PKG_LICENSE:=Public-Domain BSD-2-Clause Python-2.0.1 GPL-3.0-or-later
+PKG_LICENSE_FILES:=COPYING.txt licenses/BSD-2-Clause.txt licenses/python-2-1-1.txt licenses/gpl-3-0.txt
 
 include ../pypi.mk
 include $(INCLUDE_DIR)/package.mk
@@ -18,18 +19,17 @@ define Package/python3-docutils
   SUBMENU:=Python
   SECTION:=lang
   CATEGORY:=Languages
-  TITLE:=docutils
-  URL:=http://docutils.sourceforge.net
+  TITLE:=Documentation Utilities
+  URL:=https://docutils.sourceforge.io/
   DEPENDS:=+python3
 endef
 
 define Package/python3-docutils/description
-Docutils is a modular system for processing documentation into useful formats,
-such as HTML, XML, and LaTeX. For input Docutils supports reStructuredText,
-an easy-to-read, what-you-see-is-what-you-get plaintext markup syntax.
+Docutils is a modular system for processing documentation into useful
+formats, such as HTML, XML, and LaTeX. For input Docutils supports
+reStructuredText, an easy-to-read, what-you-see-is-what-you-get
+plaintext markup syntax.
 endef
-
-PYTHON3_PKG_SETUP_ARGS:=
 
 $(eval $(call Py3Package,python3-docutils))
 $(eval $(call BuildPackage,python3-docutils))

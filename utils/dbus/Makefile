@@ -8,25 +8,33 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=dbus
-PKG_VERSION:=1.13.18
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=1.16.2
+PKG_RELEASE:=4
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
 PKG_SOURCE_URL:=https://dbus.freedesktop.org/releases/dbus
-PKG_HASH:=8078f5c25e34ab907ce06905d969dc8ef0ccbec367e1e1707c7ecf8460f4254e
+PKG_HASH:=0ba2a1a4b16afe7bceb2c07e9ce99a8c2c3508e5dec290dbb643384bd6beb7e2
 
-PKG_MAINTAINER:=
+PKG_MAINTAINER:=Robert Marko <robimarko@gmail.com>
 PKG_LICENSE:=AFL-2.1
+PKG_LICENSE_FILES:=COPYING
 PKG_CPE_ID:=cpe:/a:freedesktop:dbus
 
+PKG_BUILD_PARALLEL:=1
+PKG_INSTALL:=1
+
+PKG_CONFIG_DEPENDS:= \
+	CONFIG_DBUS_VERBOSE
+
 include $(INCLUDE_DIR)/package.mk
-include $(INCLUDE_DIR)/cmake.mk
+include $(INCLUDE_DIR)/meson.mk
 
 define Package/dbus/Default
   SECTION:=utils
   CATEGORY:=Utilities
   TITLE:=Simple interprocess messaging system
   URL:=https://dbus.freedesktop.org/
+  USERID:=dbus=91:dbus=91
 endef
 
 define Package/dbus/Default/description
@@ -71,24 +79,40 @@ $(call Package/dbus/Default/description)
  This package contains D-Bus utilities.
 endef
 
-CMAKE_OPTIONS += \
-	-DDBUS_SYSTEM_SOCKET=/var/run/dbus/system_bus_socket \
-	-DDBUS_SESSION_SOCKET_DIR=/tmp \
-	-DDBUS_SYSTEM_PID_FILE=/var/run/dbus.pid \
-	-DDBUS_BUILD_TESTS=OFF \
-	-DDBUS_LINUX=ON \
-	-DDBUS_DISABLE_ASSERT=ON \
-	-DBUS_ENABLE_STATS=OFF \
-	-DDBUS_ENABLE_CONTAINERS=OFF \
-	-DENABLE_SYSTEMD=OFF \
-	-DDBUS_BUS_ENABLE_SYSTEMD=OFF \
-	-DHAVE_SYSTEMD=OFF \
-	-DDBUS_WITH_GLIB=OFF \
-	-DDBUS_ENABLE_VERBOSE_MODE=OFF \
-	-DDBUS_DISABLE_CHECKS=ON \
-	-DDBUS_BUILD_X11=OFF \
-	-DDBUS_ENABLE_DOXYGEN_DOCS=OFF \
-	-DENABLE_QT_HELP=OFF
+define Package/dbus/config
+  source "$(SOURCE)/Config.in"
+endef
+
+MESON_ARGS += \
+	-Ddbus_user=root \
+	-Dsession_socket_dir=/tmp \
+	-Dsystem_socket=/var/run/dbus/system_bus_socket \
+	-Dsystem_pid_file=/var/run/dbus/dbus.pid \
+	-Dasserts=false \
+	-Dchecks=false \
+	-Ddoxygen_docs=disabled \
+	-Dxml_docs=disabled \
+	-Dducktype_docs=disabled \
+	-Dselinux=disabled \
+	-Dapparmor=disabled \
+	-Dlibaudit=disabled \
+	-Dinotify=enabled \
+	-Dkqueue=disabled \
+	-Dsystemd=disabled \
+	-Dmodular_tests=disabled \
+	-Dintrusive_tests=false \
+	-Dinstalled_tests=false \
+	-Dx11_autolaunch=disabled \
+	-Dtools=true \
+	-Duser_session=false \
+	-Dmessage_bus=true \
+	-Dstats=false
+
+ifeq ($(CONFIG_DBUS_VERBOSE),y)
+  MESON_ARGS += -Dverbose_mode=true
+else
+  MESON_ARGS += -Dverbose_mode=false
+endif
 
 define Build/InstallDev
 	$(INSTALL_DIR) $(1)/usr/include
@@ -98,7 +122,7 @@ define Build/InstallDev
 		$(PKG_INSTALL_DIR)/usr/lib/dbus-1.0/include/dbus/*.h \
 		$(1)/usr/lib/dbus-1.0/include/dbus/
 	$(INSTALL_DIR) $(1)/usr/lib
-	$(INSTALL_DATA) $(PKG_INSTALL_DIR)/usr/lib/libdbus-1.so* \
+	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libdbus-1.so* \
 		$(1)/usr/lib/
 	$(CP) $(PKG_INSTALL_DIR)/usr/lib/dbus-1.0 $(1)/usr/lib/
 	$(INSTALL_DIR) $(1)/usr/lib/pkgconfig
@@ -119,16 +143,20 @@ define Package/dbus/install
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/bin/dbus-uuidgen $(1)/usr/bin/
 	$(INSTALL_BIN) ./files/dbus-launch $(1)/usr/bin/
 	$(INSTALL_DIR) $(1)/usr/lib
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/dbus-daemon-launch-helper $(1)/usr/lib/
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/libexec/dbus-daemon-launch-helper $(1)/usr/lib/
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/dbus.init $(1)/etc/init.d/dbus
 	$(INSTALL_DIR) $(1)/usr/share/dbus-1
 	$(CP) $(PKG_INSTALL_DIR)/usr/share/dbus-1 $(1)/usr/share/
+	$(INSTALL_DIR) $(1)/etc/capabilities
+	$(INSTALL_DATA) ./files/dbus.json $(1)/etc/capabilities
 endef
 
 define Package/dbus-utils/install
 	$(INSTALL_DIR) $(1)/usr/bin
-	$(INSTALL_BIN) 	$(PKG_INSTALL_DIR)/usr/bin/dbus-{monitor,send,update-activation-environment} $(1)/usr/bin/
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/bin/dbus-monitor $(1)/usr/bin/
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/bin/dbus-send $(1)/usr/bin/
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/bin/dbus-test-tool $(1)/usr/bin/
 endef
 
 $(eval $(call BuildPackage,libdbus))

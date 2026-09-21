@@ -4,7 +4,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=bossa
 PKG_VERSION:=1.9.1
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_RELEASE:=4
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/shumatech/BOSSA/tar.gz/$(PKG_VERSION)?
@@ -22,7 +22,7 @@ define Package/bossa
   CATEGORY:=Utilities
   DEPENDS:=+libstdcpp
   TITLE:=Utility to flash ARM microcontrollers
-  URL:=http://www.shumatech.com/web/products/bossa
+  URL:=https://www.shumatech.com/web/products/bossa
 endef
 
 define Package/bossa/description
@@ -32,9 +32,14 @@ define Package/bossa/description
 endef
 
 define Build/Compile
-	COMMON_CXXFLAGS="$(TARGET_CFLAGS) $(EXTRA_CFLAGS) $(TARGET_CPPFLAGS) $(EXTRA_CPPFLAGS)" \
-	COMMON_LDFLAGS="$(TARGET_LINKFLAGS) $(TARGET_LDFLAGS)" \
-	$(MAKE) -C $(PKG_BUILD_DIR) $(TARGET_CONFIGURE_OPTS) CFLAGS="$(TARGET_CFLAGS)" bin/bossac
+	$(MAKE) -C $(PKG_BUILD_DIR) bin/bossac \
+    OS="Linux" \
+    CC="$(TARGET_CC_NOCACHE)" \
+    CXX="$(TARGET_CXX_NOCACHE)" \
+    CFLAGS="$(TARGET_CFLAGS) $(EXTRA_CFLAGS)" \
+    CXXFLAGS="$(TARGET_CXXFLAGS) $(EXTRA_CXXFLAGS)" \
+    CPPFLAGS="$(TARGET_CPPFLAGS) $(EXTRA_CPPFLAGS)" \
+    LDFLAGS="$(TARGET_LDFLAGS) $(EXTRA_LDFLAGS)"
 endef
 
 define Package/bossa/install

@@ -8,27 +8,27 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libsodium
-PKG_BASE_VERSION:=1.0.18
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=1.0.20
+PKG_RELEASE:=1
 
-PKG_SOURCE_PROTO:=git
-PKG_SOURCE_URL:=https://github.com/jedisct1/libsodium.git
-PKG_SOURCE_DATE:=2021-09-17
-PKG_SOURCE_VERSION:=64129657a5c67f3bab84562aa8d57dacc685cc75
-PKG_MIRROR_HASH:=7497bfb012aab4fa0f096ce4fe5414d421c1ec794aaaea7a3f5b834d2a0dfa59
-
-PKG_VERSION:=$(PKG_BASE_VERSION)-$(PKG_SOURCE_DATE)-$(call version_abbrev,$(PKG_SOURCE_VERSION))
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
+PKG_SOURCE_URL:=https://download.libsodium.org/libsodium/releases \
+		https://github.com/jedisct1/libsodium/releases/download/$(PKG_VERSION)
+PKG_HASH:=ebb65ef6ca439333c2bb41a0c1990587288da07f6c7fd07cb3a18cc18d30ce19
 
 PKG_MAINTAINER:=Damiano Renfer <x9w2n7xnu@relay.firefox.com>
 PKG_LICENSE:=ISC
 PKG_LICENSE_FILES:=LICENSE
 
-PKG_USE_MIPS16:=0
+PKG_BUILD_FLAGS:=no-mips16
 PKG_FIXUP:=autoreconf
 PKG_INSTALL:=1
 PKG_BUILD_PARALLEL:=1
 
 include $(INCLUDE_DIR)/package.mk
+
+TAR_OPTIONS+= --strip-components 1
+TAR_CMD=$(HOST_TAR) -C $(1) $(TAR_OPTIONS)
 
 define Package/libsodium
   SECTION:=libs
@@ -54,6 +54,8 @@ menu "Configuration"
 		default y
 endmenu
 endef
+
+TARGET_CFLAGS += -std=gnu17
 
 CONFIGURE_ARGS+= \
 	--disable-ssp \

@@ -5,12 +5,11 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=ykdl
-PKG_VERSION:=1.8.0a2
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=1.8.2
+PKG_RELEASE:=2
 
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://codeload.github.com/SeaHOH/ykdl/tar.gz/v$(PKG_VERSION)?
-PKG_HASH:=b5ad62f83ceb191784a369d28bce4f11bd724c227fa584abfed4d01323824574
+PYPI_NAME:=ykdl
+PKG_HASH:=c689b8e4bf303d1582e40d5039539a1a754f7cf897bce73ec57c7e874e354b19
 
 PKG_MAINTAINER:=Tianling Shen <cnsztl@immortalwrt.org>
 PKG_LICENSE:=MIT
@@ -29,11 +28,11 @@ define Package/ykdl
     +ca-certificates \
     +ffmpeg \
     +python3 \
-    +python3-email \
     +python3-xml \
     +python3-codecs \
     +python3-ctypes \
-    +python3-setuptools
+    +python3-setuptools \
+    +python3-urllib
 endef
 
 $(eval $(call Py3Package,ykdl))

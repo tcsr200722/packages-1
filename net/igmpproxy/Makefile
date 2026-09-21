@@ -8,18 +8,18 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=igmpproxy
-PKG_VERSION:=0.3
+PKG_VERSION:=0.4
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://github.com/pali/igmpproxy/releases/download/${PKG_VERSION}/
-PKG_HASH:=d1fc244cb2fbbf99f720bda3e841fe59ece9b6919073790b4b892739b1b844eb
+PKG_HASH:=afa4b75a823b82f71ce99f33eae4e8136b906ae8a5ede5caaad93bac38cdae24
 PKG_MAINTAINER:=Felix Fietkau <nbd@nbd.name>
 
 include $(INCLUDE_DIR)/package.mk
 
 PKG_FIXUP:=autoreconf
-PKG_LICENSE:=GPL-2.0+
+PKG_LICENSE:=GPL-2.0-or-later
 
 define Package/igmpproxy
   SECTION:=net
@@ -27,7 +27,7 @@ define Package/igmpproxy
   SUBMENU:=Routing and Redirection
   DEPENDS:=+USE_GLIBC:librt
   TITLE:=Multicast Routing Daemon
-  URL:=http://sourceforge.net/projects/igmpproxy
+  URL:=https://github.com/pali/igmpproxy
 endef
 
 define Package/igmpproxy/description

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2019-2021 Daniel Bermond
+# Copyright (C) 2019-2024 Daniel Bermond
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -8,16 +8,17 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=proxychains-ng
-PKG_VERSION:=4.15
+PKG_VERSION:=4.17
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/rofl0r/proxychains-ng/tar.gz/v$(PKG_VERSION)?
-PKG_HASH:=c94edded38baa0447766f6e5d0ec1963bb27c7b55b2a78b305d6f58e171388f8
+PKG_HASH:=1a2dc68fcbcb2546a07a915343c1ffc75845f5d9cc3ea5eb3bf0b62a66c0196f
 
 PKG_MAINTAINER:=Daniel Bermond <dbermond@archlinux.org>
 PKG_LICENSE:=GPL-2.0-or-later
 PKG_LICENSE_FILES:=COPYING
+PKG_CPE_ID:=cpe:/a:proxychains-ng_project:proxychains-ng
 
 PKG_BUILD_PARALLEL:=1
 PKG_INSTALL:=1

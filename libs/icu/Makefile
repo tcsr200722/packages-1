@@ -8,14 +8,14 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=icu4c
-MAJOR_VERSION:=70
-MINOR_VERSION:=1
+MAJOR_VERSION:=78
+MINOR_VERSION:=3
 PKG_VERSION:=$(MAJOR_VERSION).$(MINOR_VERSION)
 PKG_RELEASE:=1
 
-PKG_SOURCE:=$(PKG_NAME)-$(MAJOR_VERSION)_$(MINOR_VERSION)-src.tgz
-PKG_SOURCE_URL:=https://github.com/unicode-org/icu/releases/download/release-$(MAJOR_VERSION)-$(MINOR_VERSION)
-PKG_HASH:=8d205428c17bf13bb535300669ed28b338a157b1c01ae66d31d0d3e2d47c3fd5
+PKG_SOURCE:=$(PKG_NAME)-$(MAJOR_VERSION).$(MINOR_VERSION)-sources.tgz
+PKG_SOURCE_URL:=https://github.com/unicode-org/icu/releases/download/release-$(MAJOR_VERSION).$(MINOR_VERSION)
+PKG_HASH:=3a2e7a47604ba702f345878308e6fefeca612ee895cf4a5f222e7955fabfe0c0
 
 PKG_LICENSE:=ICU
 PKG_LICENSE_FILES:=LICENSE
@@ -25,6 +25,7 @@ PKG_MAINTAINER:=Hirokazu MORIKAWA <morikw2@gmail.com>
 
 PKG_INSTALL:=1
 PKG_BUILD_PARALLEL:=1
+HOST_BUILD_PARALLEL:=1
 
 PKG_BUILD_DEPENDS:=icu/host
 HOST_BUILD_DEPENDS:=python3/host
@@ -39,7 +40,7 @@ define Package/icu
   SECTION:=libs
   CATEGORY:=Libraries
   TITLE:=International Components for Unicode
-  URL:=http://icu-project.org
+  URL:=https://icu.unicode.org/
   DEPENDS:=+libstdcpp +libpthread
   ABI_VERSION:=$(MAJOR_VERSION)
 endef
@@ -53,7 +54,7 @@ define Package/icu-full-data
   SECTION:=libs
   CATEGORY:=Libraries
   TITLE:=Full ICU Data
-  URL:=http://icu-project.org
+  URL:=https://icu.unicode.org/
   DEPENDS:=+icu
   ABI_VERSION:=$(MAJOR_VERSION)
 endef
@@ -61,14 +62,14 @@ endef
 define Package/icu-full-data/description
   ICU makes use of a wide variety of data tables to provide many of its services. Examples include converter mapping tables, collation rules, transliteration rules, break iterator rules and dictionaries, and other locale data.
   This package contains the complete data library provided by ICU.
-  A custom data library can be generated at http://apps.icu-project.org/datacustom/
+A custom data library can be generated at https://unicode-org.github.io/icu/userguide/icu_data/
 endef
 
 define Package/icu-data-tools
   SECTION:=libs
   CATEGORY:=Libraries
   TITLE:=ICU Data manipulation tools
-  URL:=http://icu-project.org
+  URL:=https://icu.unicode.org/
   DEPENDS:=+icu
 endef
 
@@ -79,8 +80,8 @@ endef
 CONFIGURE_CMD:= ./runConfigureICU
 CONFIGURE_ARGS:= \
 	Linux/gcc \
-	CC="$(TARGET_CC)" \
-	CXX="$(TARGET_CXX)" \
+	CC="$(TARGET_CC_NOCACHE)" \
+	CXX="$(TARGET_CXX_NOCACHE)" \
 	--target=$(GNU_TARGET_NAME) \
 	--host=$(GNU_TARGET_NAME) \
 	--build=$(GNU_HOST_NAME) \
@@ -104,7 +105,7 @@ HOST_CONFIGURE_VARS:=
 ifeq ($(HOST_OS),Darwin)
 HOST_CONFIGURE_ARGS:= MacOSX
 else
-HOST_CONFIGURE_ARGS:= Linux/gcc 
+HOST_CONFIGURE_ARGS:= Linux/gcc
 endif
 HOST_CONFIGURE_ARGS+= \
 	--disable-debug \

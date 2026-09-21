@@ -1,18 +1,18 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=exfatprogs
-PKG_VERSION:=1.1.2
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=1.4.3
+PKG_RELEASE:=1
 
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://codeload.github.com/$(PKG_NAME)/$(PKG_NAME)/tar.gz/$(PKG_VERSION)?
-PKG_HASH:=23cb2b709821efe9eecf10a9594be0b26d7c01192b47339902328d817c6cb358
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
+PKG_SOURCE_URL:=https://github.com/exfatprogs/exfatprogs/releases/download/$(PKG_VERSION)
+PKG_HASH:=57226a8ec1bfbce06d68a42cde8cd980414a9457882e691fbce4a4f86c8d5f08
 
 PKG_MAINTAINER:=Daniel Golle <daniel@makrotopia.org>
 PKG_LICENSE:=GPL-2.0-only
 PKG_LICENSE_FILES:=COPYING
+PKG_CPE_ID:=cpe:/a:namjaejeon:exfatprogs
 
-PKG_FIXUP:=autoreconf
 PKG_INSTALL:=1
 PKG_BUILD_PARALLEL:=1
 
@@ -23,6 +23,7 @@ define Package/exfatprogs/Default
   CATEGORY:=Utilities
   SUBMENU:=Filesystem
   URL:=https://github.com/exfatprogs/exfatprogs
+  DEPENDS:=+libblkid +USE_MUSL:musl-fts
 endef
 
 define Package/exfat-mkfs
@@ -38,6 +39,8 @@ endef
 CONFIGURE_ARGS += \
 	--enable-shared \
 	--disable-static
+
+TARGET_LDFLAGS += $(if $(CONFIG_USE_MUSL),-lfts)
 
 define Package/exfat-mkfs/install
 	$(INSTALL_DIR) $(1)/usr/sbin

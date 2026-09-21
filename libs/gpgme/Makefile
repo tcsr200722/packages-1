@@ -1,16 +1,17 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=gpgme
-PKG_VERSION:=1.16.0
+PKG_VERSION:=2.1.2
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
 PKG_SOURCE_URL:=https://gnupg.org/ftp/gcrypt/$(PKG_NAME)
-PKG_HASH:=6c8cc4aedb10d5d4c905894ba1d850544619ee765606ac43df7405865de29ed0
+PKG_HASH:=0687a95b299871c4141f507c0f740de6b429c9ac067d0fa4e062e3264df5fb77
 
 PKG_MAINTAINER:=Daniel Golle <daniel@makrotopia.org>
-PKG_LICENSE:=GPL-3.0-or-later
+PKG_LICENSE:=LGPL-2.1-or-later
 PKG_LICENSE_FILES:=COPYING
+PKG_CPE_ID:=cpe:/a:gnu:gpgme
 
 PKG_FIXUP:=autoreconf
 PKG_INSTALL:=1
@@ -24,14 +25,6 @@ define Package/libgpgme
   TITLE:=GnuPG Made Easy (GPGME) library
   URL:=https://gnupg.org/software/gpgme/index.html
   DEPENDS:=+libassuan +libgpg-error
-endef
-
-define Package/libgpgmepp
-  SECTION:=libs
-  CATEGORY:=Libraries
-  TITLE:=GnuPG Made Easy (GPGME) library (C++)
-  URL:=https://gnupg.org/software/gpgme/index.html
-  DEPENDS:=+libgpgme +libstdcpp
 endef
 
 define Package/libgpgme/description
@@ -50,16 +43,17 @@ CONFIGURE_ARGS += \
 	--disable-gpg-test \
 	--disable-gpgsm-test \
 	--disable-g13-test \
-	--enable-languages="cpp"
+	--enable-languages=""
+
+ifneq ($(CONFIG_USE_MUSL),)
+  TARGET_CFLAGS += -D_LARGEFILE64_SOURCE
+endif
 
 define Build/InstallDev
-	$(INSTALL_DIR) $(1)/usr/include/gpgme++
+	$(INSTALL_DIR) $(1)/usr/include
 	$(INSTALL_DATA) \
 		$(PKG_INSTALL_DIR)/usr/include/gpgme.h \
 		$(1)/usr/include/
-	$(INSTALL_DATA) \
-		$(PKG_INSTALL_DIR)/usr/include/gpgme++/*.h \
-		$(1)/usr/include/gpgme++/
 
 	$(INSTALL_DIR) $(1)/usr/lib
 	$(CP) \
@@ -79,11 +73,6 @@ define Build/InstallDev
 		$(PKG_INSTALL_DIR)/usr/lib/pkgconfig/gpgme-glib.pc \
 		$(1)/usr/lib/pkgconfig
 
-	$(INSTALL_DIR) $(1)/usr/lib/cmake/Gpgmepp
-	$(INSTALL_DATA) \
-		$(PKG_INSTALL_DIR)/usr/lib/cmake/Gpgmepp/*.cmake \
-		$(1)/usr/lib/cmake/Gpgmepp
-
 	$(INSTALL_DIR) $(2)/bin $(1)/usr/bin
 	$(INSTALL_BIN) \
 		$(PKG_INSTALL_DIR)/usr/bin/gpgme-config \
@@ -91,7 +80,7 @@ define Build/InstallDev
 	$(SED) \
 		's,^\(prefix\|exec_prefix\)=.*,\1=$(STAGING_DIR)/usr,g' \
 		$(2)/bin/gpgme-config
-	$(LN) -sf $(STAGING_DIR)/host/bin/gpgme-config $(1)/usr/bin/gpgme-config
+	$(LN) $(STAGING_DIR)/host/bin/gpgme-config $(1)/usr/bin/gpgme-config
 endef
 
 define Package/libgpgme/install
@@ -99,10 +88,4 @@ define Package/libgpgme/install
 	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libgpgme.so.* $(1)/usr/lib/
 endef
 
-define Package/libgpgmepp/install
-	$(INSTALL_DIR) $(1)/usr/lib
-	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libgpgmepp.so.* $(1)/usr/lib/
-endef
-
 $(eval $(call BuildPackage,libgpgme))
-$(eval $(call BuildPackage,libgpgmepp))

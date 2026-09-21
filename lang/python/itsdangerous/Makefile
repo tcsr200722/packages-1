@@ -5,13 +5,13 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=itsdangerous
-PKG_VERSION:=2.0.1
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=2.2.0
+PKG_RELEASE:=1
 
 PYPI_NAME:=$(PKG_NAME)
-PKG_HASH:=9e724d68fc22902a1435351f84c3fb8623f303fffcc566a4cb952df8c572cff0
+PKG_HASH:=e0050c0b7da1eea53ffaf149c0cfbb5c6e2e2b69c4bef22c81fa6eb73e5f6173
 
-PKG_MAINTAINER:=Daniel Golle <daniel@makrotopia.org>
+PKG_MAINTAINER:=Alexandru Ardelean <ardeleanalex@gmail.com>
 PKG_LICENSE:=BSD-3-Clause
 PKG_LICENSE_FILES:=LICENSE
 

@@ -5,47 +5,26 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=dnsproxy
-PKG_VERSION:=0.39.10
-PKG_RELEASE:=$(AUTORELESE)
+PKG_VERSION:=0.84.1
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/AdguardTeam/dnsproxy/tar.gz/v$(PKG_VERSION)?
-PKG_HASH:=a580b66f018f4d95a2bad4c45427ca12303e1a75a0c644e150304df7a4e69d47
+PKG_HASH:=fb99ae07d991bb58277ca857389933cbdc6cbf86f1a1c3eab8ccd4df4e333eec
 
 PKG_MAINTAINER:=Tianling Shen <cnsztl@immortalwrt.org>
 PKG_LICENSE:=Apache-2.0
 PKG_LICENSE_FILES:=LICENSE
 
-PKG_CONFIG_DEPENDS:= \
-	CONFIG_DNSPROXY_COMPRESS_GOPROXY \
-	CONFIG_DNSPROXY_COMPRESS_UPX
-
 PKG_BUILD_DEPENDS:=golang/host
 PKG_BUILD_PARALLEL:=1
-PKG_USE_MIPS16:=0
+PKG_BUILD_FLAGS:=no-mips16
 
 GO_PKG:=github.com/AdguardTeam/dnsproxy
-GO_PKG_LDFLAGS:=-s -w
-GO_PKG_LDFLAGS_X:=main.VersionString=v$(PKG_VERSION)
+GO_PKG_LDFLAGS_X:=github.com/AdguardTeam/golibs/version.version=v$(PKG_VERSION)
 
 include $(INCLUDE_DIR)/package.mk
 include ../../lang/golang/golang-package.mk
-
-define Package/dnsproxy/config
-config DNSPROXY_COMPRESS_GOPROXY
-	bool "Compiling with GOPROXY proxy"
-	default n
-
-config DNSPROXY_COMPRESS_UPX
-	bool "Compress executable files with UPX"
-	depends on !mips64
-	default y if mips||mipsel
-endef
-
-ifeq ($(CONFIG_DNSPROXY_COMPRESS_GOPROXY),y)
-	export GO111MODULE=on
-	export GOPROXY=https://goproxy.baidu.com
-endif
 
 define Package/dnsproxy
   SECTION:=net
@@ -63,20 +42,19 @@ define Package/dnsproxy/description
   work as a DNS-over-HTTPS, DNS-over-TLS or DNS-over-QUIC server.
 endef
 
-define Build/Compile
-	$(call GoPackage/Build/Compile)
-ifeq ($(CONFIG_DNSPROXY_COMPRESS_UPX),y)
-	$(STAGING_DIR_HOST)/bin/upx --lzma --best $(GO_PKG_BUILD_BIN_DIR)/dnsproxy
-endif
-endef
-
 define Package/dnsproxy/install
 	$(call GoPackage/Package/Install/Bin,$(1))
 
+	$(INSTALL_DIR) $(1)/etc/capabilities/
+	$(INSTALL_DATA) $(CURDIR)/files/dnsproxy.json $(1)/etc/capabilities/dnsproxy.json
 	$(INSTALL_DIR) $(1)/etc/config/
 	$(INSTALL_CONF) $(CURDIR)/files/dnsproxy.config $(1)/etc/config/dnsproxy
 	$(INSTALL_DIR) $(1)/etc/init.d/
 	$(INSTALL_BIN) $(CURDIR)/files/dnsproxy.init $(1)/etc/init.d/dnsproxy
+	$(INSTALL_DIR) $(1)/etc/uci-defaults/
+	$(INSTALL_BIN) $(CURDIR)/files/dnsproxy.defaults $(1)/etc/uci-defaults/80-dnsproxy-migration
+	$(INSTALL_DIR) $(1)/etc/sysctl.d/
+	$(INSTALL_CONF) ./files/dnsproxy.sysctl $(1)/etc/sysctl.d/50-dnsproxy.conf
 endef
 
 define Package/dnsproxy/conffiles

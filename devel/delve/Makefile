@@ -1,20 +1,20 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=delve
-PKG_VERSION:=1.7.2
+PKG_VERSION:=1.27.1
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/go-delve/delve/tar.gz/v$(PKG_VERSION)?
-PKG_HASH:=c2eb068d5677e114286b38f57f784b3792dbd2db06743bb57217611a092b31f2
+PKG_HASH:=dca9ec6f2c392a00449ad748b3a229e92ba4efa67f4e7582f2cc45974429928f
 
 PKG_LICENSE:=MIT
 PKG_LICENSE_FILES:=LICENSE
-PKG_MAINTAINER:=Niels Widger <niels@qacafe.com>
+PKG_MAINTAINER:=Alexandru Ardelean <ardeleanalex@gmail.com>
 
 PKG_BUILD_DEPENDS:=golang/host
 PKG_BUILD_PARALLEL:=1
-PKG_USE_MIPS16:=0
+PKG_BUILD_FLAGS:=no-mips16
 
 GO_PKG:=github.com/go-delve/delve/
 GO_PKG_BUILD_PKG:=github.com/go-delve/delve/cmd/dlv/

@@ -7,26 +7,24 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=rtl-sdr
-PKG_VERSION:=0.6.0
-PKG_RELEASE:=2
+PKG_VERSION:=2.0.2
+PKG_RELEASE:=1
 
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://git.osmocom.org/rtl-sdr/snapshot
-PKG_HASH:=ee10a76fe0c6601102367d4cdf5c26271e9442d0491aa8df27e5a9bf639cff7c
-
-CMAKE_INSTALL:=1
-
-PKG_LICENSE:=GPLv2
-PKG_LICENSE_FILES:=COPYING
+PKG_SOURCE_PROTO:=git
+PKG_SOURCE_VERSION:=v2.0.2
+PKG_SOURCE_URL:=https://gitea.osmocom.org/sdr/rtl-sdr
+PKG_MIRROR_HASH:=a6193da128f7bcba83c2af95896e6e34a31b1ac3419c976a32a67f13a0f6e864
 
 PKG_MAINTAINER:=Vasilis Tsiligiannis <b_tsiligiannis@silverton.gr>
+PKG_LICENSE:=GPL-2.0-or-later
+PKG_LICENSE_FILES:=COPYING
 
 include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/cmake.mk
 
 define Package/rtl-sdr/Default
   TITLE:=Software Defined Radio with Realtek RTL2832U
-  URL:=http://sdr.osmocom.org/trac/wiki/rtl-sdr
+  URL:=https://osmocom.org/projects/rtl-sdr
 endef
 
 define Package/rtl-sdr/Default/description

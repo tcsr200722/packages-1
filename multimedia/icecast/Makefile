@@ -7,7 +7,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=icecast
 PKG_VERSION:=2.4.4
-PKG_RELEASE:=3
+PKG_RELEASE:=5
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://downloads.xiph.org/releases/icecast/
@@ -18,7 +18,7 @@ PKG_MAINTAINER:=André Gaul <andre@gaul.io>, \
 
 PKG_LICENSE:=GPL-2.0
 PKG_LICENSE_FILES:=COPYING
-PKG_CPE_ID:=cpe:/a:icecast:icecast
+PKG_CPE_ID:=cpe:/a:xiph:icecast
 
 PKG_FIXUP:=autoreconf
 PKG_INSTALL:= 1
@@ -55,6 +55,7 @@ CONFIGURE_ARGS+= \
 	--with-vorbis="$(STAGING_DIR)/usr" \
 	--with-xslt-config="$(STAGING_DIR)/usr/bin/xslt-config"
 
+TARGET_CFLAGS+= -I$(STAGING_DIR)/usr/include/libxml2
 
 # Manually edit configure in case both vorbis and tremor host packages are installed
 define Build/Configure

@@ -7,17 +7,17 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=nss
-PKG_VERSION:=3.69
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=3.125
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:= \
     https://download.cdn.mozilla.net/pub/security/$(PKG_NAME)/releases/NSS_$(subst .,_,$(PKG_VERSION))_RTM/src \
     https://archive.mozilla.org/pub/security/$(PKG_NAME)/releases/NSS_$(subst .,_,$(PKG_VERSION))_RTM/src
-PKG_HASH:=c880205a365e0dd488ff29fdea82716ff9fcde9da6f3b703d636f8fc08008799
+PKG_HASH:=1ad541f10da7c58dec01f540ecc44d28cbbc033f741a57473de5a0893d91606d
 
 PKG_MAINTAINER:=Lucian Cristian <lucian.cristian@gmail.com>
-PKG_LICENCE:=MPL-2.0
+PKG_LICENSE:=MPL-2.0
 PKG_LICENSE_FILES:=nss/COPYING
 PKG_CPE_ID:=cpe:/a:mozilla:network_security_services
 

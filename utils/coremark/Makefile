@@ -8,20 +8,20 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=coremark
-PKG_SOURCE_DATE:=2021-03-12
-PKG_SOURCE_VERSION:=1541482bf3e6ef7f5c69f5be76b14537b60833d0
+PKG_SOURCE_DATE:=2025-05-01
+PKG_SOURCE_VERSION:=1f483d5b8316753a742cbf5590caf5bd0a4e4777
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_SOURCE_DATE).tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/eembc/coremark/tar.gz/$(PKG_SOURCE_VERSION)?
-PKG_HASH:=ad32cb10ba491f5c897f1022e97bca691cc88fdbb02ded48a0766c10344abc4f
+PKG_HASH:=4067e7f260218df13f2875d8f821a8ff32a84153c6e0759d7c89f96c0a8bf987
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_SOURCE_VERSION)
 
 PKG_MAINTAINER:=Lim Guo Wei <limguowei@gmail.com>
 PKG_LICENSE:=Apache-2.0
 PKG_LICENSE_FILES:=LICENSE.md
 
-PKG_USE_MIPS16:=0
+PKG_BUILD_FLAGS:=no-mips16 lto
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -42,7 +42,7 @@ define Package/coremark/config
 		depends on PACKAGE_coremark
 		default y
 		help
-			This enables additional optmizations using the -O3 compilation flag.
+			This enables additional optimizations using the -O3 compilation flag.
 
 	config COREMARK_ENABLE_MULTITHREADING
 		bool "Enable multithreading support"
@@ -59,8 +59,6 @@ define Package/coremark/config
 			Number of threads to run in parallel
 endef
 
-TARGET_CFLAGS += -flto
-
 ifeq ($(CONFIG_COREMARK_OPTIMIZE_O3),y)
 	TARGET_CFLAGS := $(filter-out -O%,$(TARGET_CFLAGS)) -O3
 endif
@@ -71,8 +69,8 @@ endif
 
 define Build/Compile
 	$(SED) 's|EXE = .exe|EXE =|' $(PKG_BUILD_DIR)/posix/core_portme.mak
-	mkdir $(PKG_BUILD_DIR)/$(ARCH)
-	$(CP) -r $(PKG_BUILD_DIR)/linux/* $(PKG_BUILD_DIR)/$(ARCH)
+	mkdir -p $(PKG_BUILD_DIR)/$(ARCH)
+	$(CP) $(PKG_BUILD_DIR)/linux/* $(PKG_BUILD_DIR)/$(ARCH)/
 	$(MAKE) -C $(PKG_BUILD_DIR) PORT_DIR=$(ARCH) $(MAKE_FLAGS) \
 		PORT_CFLAGS="$(TARGET_CFLAGS)" XCFLAGS="$(EXTRA_CFLAGS)" compile
 endef

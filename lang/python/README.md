@@ -109,7 +109,7 @@ By default, automatic Python byte-code generation is disabled when running a Pyt
 The basis of all these packages is:
 * [lang/python/python3](./python3) - The Python 3.x.y interpreter
 
-This is a normal OpenWrt package, which will build the Python interpreter. This also provides `python3-pip` & `python3-setuptools`. Each Python package is actually split into multiple sub-packages [e.g. python3-email, python3-sqlite3, etc]. This can be viewed inside [lang/python/python3/files](./python3/files).
+This is a normal OpenWrt package, which will build the Python interpreter. This also provides `python3-pip` & `python3-setuptools`. Each Python package is actually split into multiple sub-packages [e.g. python3-urllib, python3-sqlite3, etc]. This can be viewed inside [lang/python/python3/files](./python3/files).
 
 The reason for this splitting, is purely to offer a way for some people to package Python in as-minimal-as-possible-and-still-runable way, and also to be somewhat maintainable when packaging. A standard Python installation can take ~20-30 MBs of disk, which can be somewhat big for some people, so there is the `python3-base` package which brings that down to ~5 MBs. This seems to be good enough (and interesting) for a number of people.
 
@@ -369,3 +369,30 @@ HOST_PYTHON3_PACKAGE_BUILD_DEPENDS:=setuptools-scm
 ```
 
 The Python package will be installed in `$(STAGING_DIR_HOSTPKG)/lib/pythonX.Y/site-packages`.
+
+#### Non-Python packages installing host-side Python packages
+
+Non-Python packages can also install host-side Python packages using the same mechanism:
+
+* Set `HOST_PYTHON3_PACKAGE_BUILD_DEPENDS` (see above for details).
+
+* Include `python3-package.mk` (set `PYTHON3_PKG_BUILD:=0` to avoid using the default Python package build recipes).
+
+* Call `Py3Build/InstallBuildDepends` to initiate the installation.
+
+For example:
+
+```
+PYTHON3_PKG_BUILD:=0
+HOST_PYTHON3_PACKAGE_BUILD_DEPENDS:=setuptools-scm
+
+include $(INCLUDE_DIR)/package.mk
+include ../../lang/python/python3-package.mk
+# If outside of the packages feed:
+# include $(TOPDIR)/feeds/packages/lang/python/python3-package.mk
+
+define Build/Compile
+	$(call Py3Build/InstallBuildDepends)
+	$(call Build/Compile/Default)
+endef
+```

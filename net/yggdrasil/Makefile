@@ -1,12 +1,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=yggdrasil
-PKG_VERSION:=0.4.0
-PKG_RELEASE:=2
+PKG_VERSION:=0.5.13
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/yggdrasil-network/yggdrasil-go/tar.gz/v$(PKG_VERSION)?
-PKG_HASH:=6ad762012ef1a73bfb718db4a23c5a0067e13939d0655221afc4c1f723736cbf
+PKG_HASH:=e19a3c3121d6a5e9abdc9f4d42decbd62ed97ccbe301c842f2d30ac1eba9c4c2
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-go-$(PKG_VERSION)
 
 PKG_MAINTAINER:=William Fleurant <meshnet@protonmail.com>
@@ -15,7 +15,7 @@ PKG_LICENSE_FILES:=LICENSE
 
 PKG_BUILD_DEPENDS:=golang/host
 PKG_BUILD_PARALLEL:=1
-PKG_USE_MIPS16:=0
+PKG_BUILD_FLAGS:=no-mips16
 
 GO_PKG:=github.com/yggdrasil-network/yggdrasil-go
 GO_PKG_BUILD_PKG:=github.com/yggdrasil-network/yggdrasil-go/cmd/...
@@ -33,27 +33,16 @@ define Package/yggdrasil
 	SUBMENU:=Routing and Redirection
 	TITLE:=Yggdrasil supports end-to-end encrypted IPv6 networks
 	URL:=https://yggdrasil-network.github.io/
-	DEPENDS:=$(GO_ARCH_DEPENDS) @IPV6 +kmod-tun +dkjson +libuci-lua
+	DEPENDS:=$(GO_ARCH_DEPENDS) @IPV6 +kmod-tun
 endef
 
 define Package/yggdrasil/description
  Yggdrasil builds end-to-end encrypted networks with IPv6.
- Beyond the similarities with cjdns is a different routing
- algorithm. This globally-agreed spanning tree uses greedy
- routing in a metric space. Back-pressure routing techniques
- allow advanced link aggregation bonding on per-stream basis.
- In turn, a single stream will span across multiple network
- interfaces simultaneously with much greater throughput.
-endef
-
-define Package/yggdrasil/conffiles
-/etc/config/yggdrasil
 endef
 
 define Package/yggdrasil/install
 	$(INSTALL_DIR) \
-		$(1)/etc/init.d \
-		$(1)/etc/uci-defaults \
+		$(1)/lib/netifd/proto \
 		$(1)/usr/sbin
 
 	$(INSTALL_BIN) \
@@ -65,16 +54,8 @@ define Package/yggdrasil/install
 		$(1)/usr/sbin
 
 	$(INSTALL_BIN) \
-		./files/ygguci \
-		$(1)/usr/sbin
-
-	$(INSTALL_BIN) \
-		./files/yggdrasil.defaults \
-		$(1)/etc/uci-defaults/yggdrasil
-
-	$(INSTALL_BIN) \
-		./files/yggdrasil.init \
-		$(1)/etc/init.d/yggdrasil
+		./files/yggdrasil.sh \
+		$(1)/lib/netifd/proto
 endef
 
 $(eval $(call GoBinPackage,yggdrasil))

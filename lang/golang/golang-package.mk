@@ -1,9 +1,7 @@
 #
-# Copyright (C) 2018-2020 Jeffery To
+# Copyright (C) 2018-2022 Jeffery To
 #
-# This is free software, licensed under the GNU General Public License v2.
-# See /LICENSE for more information.
-#
+# SPDX-License-Identifier: GPL-2.0-only
 
 ifeq ($(origin GO_INCLUDE_DIR),undefined)
   GO_INCLUDE_DIR:=$(dir $(lastword $(MAKEFILE_LIST)))
@@ -32,7 +30,7 @@ include $(GO_INCLUDE_DIR)/golang-values.mk
 #
 #   * Files in any 'testdata' directory
 #
-#   * go.mod and go.sum, in any directory
+#   * go.mod, go.sum and go.work, in any directory
 #
 #   e.g. GO_PKG_INSTALL_EXTRA:=example.toml marshal_test.toml
 #
@@ -130,7 +128,7 @@ GO_PKG_INSTALL_BIN_PATH?=/usr/bin
 
 GO_PKG_WORK_DIR_NAME:=.go_work
 GO_PKG_BUILD_DIR=$(PKG_BUILD_DIR)/$(GO_PKG_WORK_DIR_NAME)/build
-GO_PKG_BUILD_BIN_DIR=$(GO_PKG_BUILD_DIR)/bin$(if $(GO_HOST_TARGET_DIFFERENT),/$(GO_OS_ARCH))
+GO_PKG_BUILD_BIN_DIR=$(GO_PKG_BUILD_DIR)/bin$(if $(GO_HOST_TARGET_DIFFERENT),/$(subst /,_,$(GO_OS_ARCH)))
 
 GO_PKG_BUILD_DEPENDS_PATH:=/usr/share/gocode
 GO_PKG_BUILD_DEPENDS_SRC=$(STAGING_DIR)$(GO_PKG_BUILD_DEPENDS_PATH)/src
@@ -179,7 +177,13 @@ define GoPackage/GoSubMenu
   CATEGORY:=Languages
 endef
 
+# Some packages like docker use go directly and don't process vars like GO, so
+# just add selected version to path and insert it into several used vars.
+GO_BIN_PATH:= \
+	PATH=$(STAGING_DIR_HOSTPKG)/lib/go-$(GO_HOST_VERSION)/bin:$(PATH)
+
 GO_PKG_BUILD_CONFIG_VARS= \
+	$(GO_BIN_PATH) \
 	GO_PKG="$(strip $(GO_PKG))" \
 	GO_INSTALL_EXTRA="$(strip $(GO_PKG_INSTALL_EXTRA))" \
 	GO_INSTALL_ALL="$(strip $(GO_PKG_INSTALL_ALL))" \
@@ -198,9 +202,12 @@ GO_PKG_TARGET_VARS= \
 	GOOS="$(GO_OS)" \
 	GOARCH="$(GO_ARCH)" \
 	GO386="$(GO_386)" \
+	GOAMD64="$(GO_AMD64)" \
 	GOARM="$(GO_ARM)" \
+	GOARM64="$(GO_ARM64)" \
 	GOMIPS="$(GO_MIPS)" \
 	GOMIPS64="$(GO_MIPS64)" \
+	GOPPC64="$(GO_PPC64)" \
 	CGO_ENABLED=1 \
 	CC="$(TARGET_CC)" \
 	CXX="$(TARGET_CXX)" \
@@ -213,9 +220,11 @@ GO_PKG_BUILD_VARS= \
 	GOPATH="$(GO_PKG_BUILD_DIR)" \
 	GOCACHE="$(GO_BUILD_CACHE_DIR)" \
 	GOMODCACHE="$(GO_MOD_CACHE_DIR)" \
-	GOENV=off
+	GOENV=off \
+	GOTOOLCHAIN=local
 
 GO_PKG_VARS= \
+	$(GO_BIN_PATH) \
 	$(GO_PKG_TARGET_VARS) \
 	$(GO_PKG_BUILD_VARS)
 
@@ -226,7 +235,6 @@ GO_PKG_DEFAULT_ASMFLAGS= \
 	$(if $(GO_PKG_ENABLE_SPECTRE),-spectre all)
 
 GO_PKG_DEFAULT_LDFLAGS= \
-	-buildid '$(SOURCE_DATE_EPOCH)' \
 	-linkmode external \
 	-extldflags '$(patsubst -z%,-Wl$(comma)-z$(comma)%,$(TARGET_LDFLAGS))'
 
@@ -236,30 +244,33 @@ GO_PKG_CUSTOM_LDFLAGS= \
 
 GO_PKG_INSTALL_ARGS= \
 	-v \
+	-buildvcs=false \
 	-trimpath \
 	-ldflags "all=$(GO_PKG_DEFAULT_LDFLAGS)" \
-	$(if $(GO_PKG_DEFAULT_GCFLAGS),-gcflags "all=$(GO_PKG_DEFAULT_GCFLAGS)") \
-	$(if $(GO_PKG_DEFAULT_ASMFLAGS),-asmflags "all=$(GO_PKG_DEFAULT_ASMFLAGS)") \
-	$(if $(filter $(GO_PKG_ENABLE_PIE),1),-buildmode pie) \
+	$(if $(strip $(GO_PKG_DEFAULT_GCFLAGS)),-gcflags "all=$(GO_PKG_DEFAULT_GCFLAGS)") \
+	$(if $(strip $(GO_PKG_DEFAULT_ASMFLAGS)),-asmflags "all=$(GO_PKG_DEFAULT_ASMFLAGS)") \
+	$(if $(GO_PKG_ENABLE_PIE),-buildmode pie) \
+	$(if $(filter $(GO_ARCH),366),-installsuffix "$(GO_386)") \
 	$(if $(filter $(GO_ARCH),arm),-installsuffix "v$(GO_ARM)") \
+	$(if $(filter $(GO_ARCH),arm64),-installsuffix "$(GO_ARM64)") \
 	$(if $(filter $(GO_ARCH),mips mipsle),-installsuffix "$(GO_MIPS)") \
 	$(if $(filter $(GO_ARCH),mips64 mips64le),-installsuffix "$(GO_MIPS64)") \
-	$(if $(GO_PKG_GCFLAGS),-gcflags "$(GO_PKG_GCFLAGS) $(GO_PKG_DEFAULT_GCFLAGS)") \
-	$(if $(GO_PKG_CUSTOM_LDFLAGS),-ldflags "$(GO_PKG_CUSTOM_LDFLAGS) $(GO_PKG_DEFAULT_LDFLAGS)") \
-	$(if $(GO_PKG_TAGS),-tags "$(GO_PKG_TAGS)")
+	$(if $(strip $(GO_PKG_GCFLAGS)),-gcflags "$(GO_PKG_GCFLAGS) $(GO_PKG_DEFAULT_GCFLAGS)") \
+	$(if $(strip $(GO_PKG_CUSTOM_LDFLAGS)),-ldflags "$(GO_PKG_CUSTOM_LDFLAGS) $(GO_PKG_DEFAULT_LDFLAGS)") \
+	$(if $(strip $(GO_PKG_TAGS)),-tags "$(GO_PKG_TAGS)")
 
 define GoPackage/Build/Configure
 	$(GO_GENERAL_BUILD_CONFIG_VARS) \
 	$(GO_PKG_BUILD_CONFIG_VARS) \
-	$(SHELL) $(GO_INCLUDE_DIR)/golang-build.sh configure
+	$(SHELL) $(GO_INCLUDE_DIR)golang-build.sh configure
 endef
 
-# $(1) additional arguments for go command line (optional)
+# 1: additional arguments for go command line (optional)
 define GoPackage/Build/Compile
 	$(GO_GENERAL_BUILD_CONFIG_VARS) \
 	$(GO_PKG_BUILD_CONFIG_VARS) \
 	$(GO_PKG_VARS) \
-	$(SHELL) $(GO_INCLUDE_DIR)/golang-build.sh build $(GO_PKG_INSTALL_ARGS) $(1)
+	$(SHELL) $(GO_INCLUDE_DIR)golang-build.sh build $(GO_PKG_INSTALL_ARGS) $(1)
 endef
 
 define GoPackage/Build/InstallDev
@@ -269,13 +280,13 @@ endef
 define GoPackage/Package/Install/Bin
 	$(GO_GENERAL_BUILD_CONFIG_VARS) \
 	$(GO_PKG_BUILD_CONFIG_VARS) \
-	$(SHELL) $(GO_INCLUDE_DIR)/golang-build.sh install_bin "$(1)"
+	$(SHELL) $(GO_INCLUDE_DIR)golang-build.sh install_bin "$(1)"
 endef
 
 define GoPackage/Package/Install/Src
 	$(GO_GENERAL_BUILD_CONFIG_VARS) \
 	$(GO_PKG_BUILD_CONFIG_VARS) \
-	$(SHELL) $(GO_INCLUDE_DIR)/golang-build.sh install_src "$(1)"
+	$(SHELL) $(GO_INCLUDE_DIR)golang-build.sh install_src "$(1)"
 endef
 
 define GoPackage/Package/Install

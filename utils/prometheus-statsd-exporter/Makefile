@@ -15,7 +15,7 @@ PKG_LICENSE_FILES:=LICENSE
 
 PKG_BUILD_DEPENDS:=golang/host
 PKG_BUILD_PARALLEL:=1
-PKG_USE_MIPS16:=0
+PKG_BUILD_FLAGS:=no-mips16
 
 GO_PKG:=github.com/prometheus/statsd_exporter
 
@@ -26,7 +26,7 @@ define Package/prometheus-statsd-exporter
   SECTION:=utils
   CATEGORY:=Utilities
   TITLE:=StatsD to Prometheus metrics exporter
-  URL:=http://prometheus.io
+  URL:=https://prometheus.io
   DEPENDS:=$(GO_ARCH_DEPENDS)
 endef
 

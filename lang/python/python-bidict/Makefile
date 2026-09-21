@@ -8,17 +8,17 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=python-bidict
-PKG_VERSION:=0.21.2
+PKG_VERSION:=0.23.1
 PKG_RELEASE:=1
 
 PYPI_NAME:=bidict
-PKG_HASH:=4fa46f7ff96dc244abfc437383d987404ae861df797e2fd5b190e233c302be09
+PKG_HASH:=03069d763bc387bbd20e7d49914e75fc4132a41937fa3405417e1a5a2d006d71
 
-PKG_MAINTAINER:=Jan Pavlinec <jan.pavlinec1@gmail.com>
+PKG_MAINTAINER:=Alexandru Ardelean <ardeleanalex@gmail.com>
 PKG_LICENSE:=MPL-2.0
 PKG_LICENSE_FILES:=LICENSE
 
-HOST_PYTHON3_PACKAGE_BUILD_DEPENDS:=setuptools-scm
+PKG_BUILD_DEPENDS:=python-setuptools/host
 
 include ../pypi.mk
 include $(INCLUDE_DIR)/package.mk
@@ -28,8 +28,8 @@ define Package/python3-bidict
   SUBMENU:=Python
   SECTION:=lang
   CATEGORY:=Languages
-  TITLE:=The bidirectional mapping library
-  URL:=https://github.com/jab/bidict
+  TITLE:=Bidirectional mapping library
+  URL:=https://bidict.readthedocs.io/
   DEPENDS:= \
 	+python3-light
 endef

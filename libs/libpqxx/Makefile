@@ -1,13 +1,13 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libpqxx
-PKG_VERSION:=7.5.2
+PKG_VERSION:=7.9.2
 PKG_RELEASE:=1
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/jtv/libpqxx
 PKG_SOURCE_VERSION:=$(PKG_VERSION)
-PKG_MIRROR_HASH:=9f7fc055f16289e871f8ff59b7fe085f5eab34264503671f357ef71d5f1bbc02
+PKG_MIRROR_HASH:=3bc0572b06b6030d046aa1f11b64d644e78a688f58febbc2b4597f07672b22a8
 
 CMAKE_INSTALL:=1
 
@@ -21,7 +21,7 @@ define Package/libpqxx
 	CATEGORY:=Libraries
 	DEPENDS:=+libpq +libstdcpp
 	TITLE:=PostgreSQL client library (C++ interface)
-	URL:=http://pqxx.org/development/libpqxx
+	URL:=https://pqxx.org/libpqxx
 	SUBMENU:=Database
 endef
 

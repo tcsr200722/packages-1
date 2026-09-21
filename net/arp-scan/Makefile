@@ -8,15 +8,16 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=arp-scan
-PKG_VERSION:=1.9.7
-PKG_RELEASE:=1
+PKG_VERSION:=1.10.0
+PKG_RELEASE:=5
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/royhills/arp-scan/tar.gz/$(PKG_VERSION)?
-PKG_HASH:=e03c36e4933c655bd0e4a841272554a347cd0136faf42c4a6564059e0761c039
+PKG_HASH:=204b13487158b8e46bf6dd207757a52621148fdd1d2467ebd104de17493bab25
 
 PKG_MAINTAINER:=Sergey Urushkin <urusha.v1.0@gmail.com>
 PKG_LICENSE:=GPL-3.0-or-later
+PKG_LICENSE_FILES:=COPYING
 
 PKG_FIXUP:=autoreconf
 
@@ -42,12 +43,16 @@ define Package/arp-scan/description
     ARP scanner
 endef
 
+CONFIGURE_ARGS += \
+	--without-libcap
+
 define Package/arp-scan/install
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/bin/arp-scan $(1)/usr/bin/
 endef
 
 define Package/arp-scan/postinst
+#!/bin/sh
 cat <<EOF
 
 Please install the arp-scan-database package in order to let arp-scan
@@ -70,13 +75,15 @@ endef
 
 define Package/arp-scan-database/install
 	$(INSTALL_DIR) $(1)/usr/share/arp-scan
-	$(INSTALL_DATA) $(PKG_BUILD_DIR)/ieee-iab.txt $(1)/usr/share/arp-scan/
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/ieee-oui.txt $(1)/usr/share/arp-scan/
-	$(INSTALL_DATA) $(PKG_BUILD_DIR)/mac-vendor.txt $(1)/usr/share/arp-scan/
+	$(INSTALL_DIR) $(1)/etc/arp-scan
+	$(INSTALL_DATA) $(PKG_BUILD_DIR)/mac-vendor.txt $(1)/etc/arp-scan/
 endef
 
 define Package/arp-scan-database/postrm
-	$(RM) -rf $(1)/usr/share/arp-scan
+#!/bin/sh
+rm -rf "$${IPKG_INSTROOT}/usr/share/arp-scan" \
+	"$${IPKG_INSTROOT}/etc/arp-scan"
 endef
 
 $(eval $(call BuildPackage,arp-scan-database))

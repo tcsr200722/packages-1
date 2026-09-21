@@ -8,13 +8,13 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=alsa-lib
-PKG_VERSION:=1.2.5.1
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=1.2.11
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
-PKG_SOURCE_URL:=ftp://ftp.alsa-project.org/pub/lib/ \
-		http://distfiles.gentoo.org/distfiles/
-PKG_HASH:=628421d950cecaf234de3f899d520c0a6923313c964ad751ffac081df331438e
+PKG_SOURCE_URL:=https://www.alsa-project.org/files/pub/lib/ \
+		https://distfiles.gentoo.org/distfiles/
+PKG_HASH:=9f3f2f69b995f9ad37359072fbc69a3a88bfba081fc83e9be30e14662795bb4d
 
 PKG_MAINTAINER:=Ted Hess <thess@kitschensync.net>, \
 		Peter Wagner <tripolar@gmx.at>
@@ -22,7 +22,7 @@ PKG_MAINTAINER:=Ted Hess <thess@kitschensync.net>, \
 PKG_FIXUP:=autoreconf
 PKG_INSTALL:=1
 PKG_BUILD_PARALLEL:=1
-PKG_USE_MIPS16:=0
+PKG_BUILD_FLAGS:=no-mips16 no-lto
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -30,7 +30,7 @@ define Package/alsa-lib
   SECTION:=libs
   CATEGORY:=Libraries
   TITLE:=ALSA (Advanced Linux Sound Architecture) library
-  URL:=http://www.alsa-project.org/
+  URL:=https://www.alsa-project.org/
   DEPENDS:=@AUDIO_SUPPORT +kmod-sound-core +libpthread +librt
   LICENSE:=LGPL-2.1-or-later
   LICENSE_FILES:=COPYING
@@ -45,7 +45,7 @@ define Package/aserver
   SECTION:=sound
   CATEGORY:=Sound
   TITLE:=ALSA (Advanced Linux Sound Architecture) server
-  URL:=http://www.alsa-project.org/
+  URL:=https://www.alsa-project.org/
   DEPENDS:=+alsa-lib
   LICENSE:=GPL-2.0-or-later
   LICENSE_FILES:=aserver/COPYING

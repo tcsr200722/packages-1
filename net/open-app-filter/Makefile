@@ -2,18 +2,15 @@ include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/kernel.mk
 
 PKG_NAME:=open-app-filter
-PKG_BASE_VERSION:=5.0.1
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_RELEASE:=1
 
 PKG_SOURCE_URL:=https://github.com/destan19/OpenAppFilter.git
 PKG_SOURCE_PROTO:=git
-PKG_SOURCE_DATE:=2021-06-28
-PKG_SOURCE_VERSION:=81f2e7abab6005f5fb49e26171c5ef0c10213a7f
-PKG_MIRROR_HASH:=b7fb1a589cfe9fe56dec52e346d47d2471feb0f8447abc7d120ebb3c502b0093
+PKG_SOURCE_DATE:=2026-04-20
+PKG_SOURCE_VERSION:=569f93bfd56afc3ae8c21f13fc973926ff6629a5
+PKG_MIRROR_HASH:=bdf5bcc8fc5ffbf64a318dc87d05fbacb545590224938f839b50c8f4193c1f52
 
-PKG_VERSION:=$(PKG_BASE_VERSION)-$(PKG_SOURCE_DATE)-$(call version_abbrev,$(PKG_SOURCE_VERSION))
-
-PKG_BUILD_PRRALLEL:=1
+PKG_BUILD_PARALLEL:=1
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -24,7 +21,7 @@ define KernelPackage/oaf
   CATEGORY:=Kernel modules
   SUBMENU:=Netfilter Extensions
   TITLE:=open app filter kernel module
-  FILES:=$(PKG_BUILD_DIR)/oaf.ko
+  FILES:=$(PKG_BUILD_DIR)/oaf/src/oaf.ko
   DEPENDS:=+kmod-ipt-conntrack
   AUTOLOAD:=$(call AutoLoad,0,oaf)
 endef
@@ -36,34 +33,35 @@ define Package/appfilter
   TITLE:=App filter userspace module
 endef
 
-MAKE_OPTS:= \
-	$(KERNEL_MAKE_FLAGS) \
-	M="$(PKG_BUILD_DIR)" \
-	EXTRA_CFLAGS="$(EXTRA_CFLAGS)" \
-	$(EXTRA_KCONFIG)
-
-define Build/Configure
-	$(call Build/Configure/Default)
-	$(CP) $(PKG_BUILD_DIR)/oaf/src/* $(PKG_BUILD_DIR)/
-endef
+MAKE_PATH:=open-app-filter/src
+MAKE_VARS+= LIBS="-lm -lpthread -lubox -luci -lubus -ljson-c -lblobmsg_json"
 
 define Build/Compile
-	+$(MAKE) $(PKG_JOBS) -C "$(LINUX_DIR)" \
-		$(MAKE_OPTS) \
-		modules
+	+$(KERNEL_MAKE) $(PKG_JOBS) \
+		M="$(PKG_BUILD_DIR)/oaf/src" modules
+
+	$(call Build/Compile/Default)
 endef
 
 define Package/appfilter/conffiles
 /etc/config/appfilter
+/etc/config/user_info
 endef
 
 define Package/appfilter/install
-	$(INSTALL_DIR) $(1)/usr/bin $(1)/etc/appfilter $(1)/etc/config $(1)/etc/init.d
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/open-app-filter/files/appfilter.sh $(1)/usr/bin/appfilter.sh
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/open-app-filter/files/gen_class.sh $(1)/usr/bin/gen_class.sh
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/open-app-filter/files/appfilter.lua $(1)/usr/bin/appfilter
-	$(INSTALL_DATA) $(PKG_BUILD_DIR)/open-app-filter/files/feature.cfg $(1)/etc/appfilter/feature.cfg
+	$(INSTALL_DIR) $(1)/usr/bin
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/open-app-filter/src/oafd $(1)/usr/bin/
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/open-app-filter/files/gen_class.sh $(1)/usr/bin/
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/open-app-filter/files/hnat.sh $(1)/usr/bin/
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/open-app-filter/files/oaf_rule $(1)/usr/bin/
+
+	$(INSTALL_DIR) $(1)/etc/appfilter
+	$(INSTALL_DATA) $(PKG_BUILD_DIR)/open-app-filter/files/feature_cn.cfg $(1)/etc/appfilter/
+	$(INSTALL_DATA) $(PKG_BUILD_DIR)/open-app-filter/files/feature_en.cfg $(1)/etc/appfilter/
+
+	$(INSTALL_DIR) $(1)/etc/config $(1)/etc/init.d
 	$(INSTALL_CONF) $(PKG_BUILD_DIR)/open-app-filter/files/appfilter.config $(1)/etc/config/appfilter
+	$(INSTALL_CONF) $(PKG_BUILD_DIR)/open-app-filter/files/user_info.config $(1)/etc/config/user_info
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/open-app-filter/files/appfilter.init $(1)/etc/init.d/appfilter
 endef
 

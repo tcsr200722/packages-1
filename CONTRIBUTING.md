@@ -11,31 +11,44 @@ guidelines:
   be updated regularly with supported versions.
 - Have no dependencies outside the OpenWrt core packages or this repository
   feed.
-- Have been tested to compile with the correct includes and dependencies.
-  Please also test with "Compile with full language support" found under
-  "General Build Settings" set if language support is relevant to your package.
-- Best of all -- it works as expected!
+- The compilation has been successfully tested with the appropriate includes and dependencies.
+  Additionally, if language support is relevant to your package, please enable the "Compile with full language support" option found under "Global Build Settings" in "menuconfig" and conduct further tests.
+- Most important -- the packaged software is tested to work as expected!
+
+### Pointers to the guidelines the LLM reviewers use
+
+If you have questions about what is expected of a pull request, and there is
+no specific documentation for your case, or the comments from a reviewer seem
+at odds with the documentation you have found, it can be useful to refer to the
+prompts given to the automated LLM reviewer.
+
+- [Project-wide LLM review guidelines](https://github.com/openwrt/actions-shared-workflows/tree/main/llm-review-prompts)
+- [Packages repository-specific LLM review addendum](https://github.com/openwrt/packages/blob/master/.github/llm-review-rules.md)
 
 ## Package Sources (archives and repositories)
 
-- PKG_SOURCE should reference the smallest available archive. In order of
-  preference: xz (most compressed), bzip2, gz and zip. As a last resort,
-  downloads from source repositories can be used.
-- PKG_SOURCE_URL should link to an official release archive. Use of HTTPS&#x3A;
-  is preferred. If a source archive is not available, a locally generated
+- <strong>PKG_SOURCE</strong> should reference the smallest available archive. In order of
+  preference:
+  1. xz (most compressed),
+  1. bzip2, gz and zip.
+  1. As a last resort downloads from source repositories can be used.
+- <strong>PKG_SOURCE_URL</strong> should link to an official release archive. Use of `https://`
+  is preferred.
+
+  If a source archive is not available, a locally generated
   archive fetched using git, svn, cvs or in rare circumstances, hg or bzr.
 - Convenience macros for popular mirrors are defined. Using these macros will
   make your package downloads more robust by mapping to a list of possible
   source mirrors for archive availability.
-  - @SF - Sourceforge (downloads.sourceforge.net) with 5 retries due to
+  - `@SF` - SourceForge (downloads.sourceforge.net) with 5 retries due to
     re-directs
-  - @GITHUB - Github (raw.githubusercontent.com) with 5 retries due to
+  - `@GITHUB` - GitHub (raw.githubusercontent.com) with 5 retries due to
     re-directs
-  - @GNU - 8 regional servers
-  - @GNOME - 8 regional servers
-  - @SAVANNAH - 8 regional servers
-  - @APACHE - 8 regional servers
-  - @KERNEL - Linux kernel archives & mirrors
+  - `@GNU` - 8 regional servers
+  - `@GNOME` - 8 regional servers
+  - `@SAVANNAH` - 8 regional servers
+  - `@APACHE` - 8 regional servers
+  - `@KERNEL` - Linux kernel archives & mirrors
 - Please _DO NOT_ use an archive which changes over time. A version labeled
   "latest" is not constant each download. Also, using the head of a branch will
   create unpredictable results which can be different each build.
@@ -47,17 +60,17 @@ guidelines:
   contract to OpenWrt. Assigning a Copyright to yourself or organization you
   represent is acceptable.
 - A (PKG\_)MAINTAINER definition listing either yourself and/or another person
-  responsible for this package (E.g.: PKG_MAINTAINER:= Joe D. Hacker
-  `<jdh@jdhs-email-provider.org`>). Listing multiple maintainers is encouraged in
+  responsible for this package (E.g.: `PKG_MAINTAINER:= Joe D. Hacker
+  <jdh@jdhs-email-provider.org>`). Listing multiple maintainers is encouraged in
   order to keep the package active and up-to-date. Leaving this blank will also
   be accepted, however the review process may not be as quick as one with a
   maintainer.
-- A PKG_LICENSE tag declaring the main license of the package.  (E.g.:
+- A <strong>PKG_LICENSE</strong> tag declaring the main license of the package.  (E.g.:
   PKG_LICENSE:=GPL-2.0-or-later) Please use SPDX identifiers if possible (see
   list at the bottom).
-- An optional PKG_LICENSE_FILES tag including the filenames of the
+- An optional <strong>PKG_LICENSE_FILES</strong> tag including the filenames of the
   license-files in the source-package.  (E.g.: PKG_LICENSE_FILES:=COPYING)
-- PKG_RELEASE should be initially set to 1 or reset to 1 if the software
+- <strong>PKG_RELEASE</strong> should be initially set to `1` or reset to `1` if the software
   version is changed. You should increment it if the package itself has
   changed. For example, modifying a support script, changing configure options
   like --disable_ or --enable\_ switches, or if you changed something in the
@@ -65,23 +78,27 @@ guidelines:
   correcting md5sums, changing mirror URLs, adding a maintainer field or updating
   a comment or copyright year in a Makefile do not require a change to
   PKG_RELEASE.
-- Avoid reuse of PKG_NAME in call, define and eval lines to improve
+- Avoid reuse of <strong>PKG_NAME</strong> in call, define and eval lines to improve
   readability.
 
 ### Commits in your pull-requests should
 
-- Have a useful description prefixed with the package name (E.g.: "foopkg: Add
-  libzot dependency")
+- Have a useful commit subject prefixed with the package name (E.g.: `foopkg:
+  add libzot dependency`).
 - Include Signed-off-by tag in the commit comments.  See: [Sign your
   work](https://openwrt.org/submitting-patches#sign_your_work)
+- Author and sign-off must match and be a real name and real email address.
+  GitHub private email addresses will not be accepted.
+- Follow all [Submission Guidelines](https://openwrt.org/submitting-patches#submission_guidelines)
+  requirements, including maximum characters per line.
 
 ## Advice on pull requests
 
-Pull requests are the easiest way to contribute changes to git repos at Github.
+Pull requests are the easiest way to contribute changes to git repos at GitHub.
 They are the preferred contribution method, as they offer a nice way for
 commenting and amending the proposed changes.
 
-- You need a local "fork" of the Github repo.
+- You need a local "fork" of the GitHub repo.
 
 - Use a "feature branch" for your changes. That separates the changes in the
   pull request from your other changes and makes it easy to edit/amend commits
@@ -89,10 +106,10 @@ commenting and amending the proposed changes.
   - Update your local git fork to the tip (of the master, usually)
   - Create the feature branch with `git checkout -b feature_x`
   - Edit changes and commit them locally
-  - Push them to your Github fork by `git push -u origin feature_x`. That
-    creates the "feature_x" branch at your Github fork and sets it as the
+  - Push them to your GitHub fork by `git push -u origin feature_x`. That
+    creates the "feature_x" branch at your GitHub fork and sets it as the
     remote of this branch
-  - When you now visit Github, you should see a proposal to create a pull
+  - When you now visit GitHub, you should see a proposal to create a pull
     request
 
 - If you later need to add new commits to the pull request, you can simply
@@ -109,13 +126,13 @@ commenting and amending the proposed changes.
   - If you added several new commits or made other changes that require
     cleaning up, you can use `git rebase -i HEAD~X` (X = number of commits to
     edit) to possibly squash some commits
-  - Push the changed commits to Github with `git push -f` to overwrite the
+  - Push the changed commits to GitHub with `git push -f` to overwrite the
     original commits in the "feature_x" branch with the new ones. The pull
     request gets automatically updated
 
 ## If you have commit access
 
-- Do NOT use git push --force.
+- Do NOT use `git push --force`.
 - Do NOT commit to other maintainer's packages without their consent.
 - Use Pull Requests if you are unsure and to suggest changes to other
   maintainers.
@@ -123,19 +140,19 @@ commenting and amending the proposed changes.
 ### Gaining commit access
 
 - We will gladly grant commit access to responsible contributors who have made
-  useful pull requests and / or feedback or patches to this repository or
+  useful pull requests and/or feedback or patches to this repository or
   OpenWrt in general. Please include your request for commit access in your next
   pull request or ticket.
 
 ## Release Branches
 
 - Old stable branches were named after the following pattern "for-XX.YY" (e.g.
-  for-14.07) before the LEDE split.  During the LEDE split there was only one
-  release branch with the name "lede-17.01".  After merging the LEDE fork with
+  for-14.07) before the LEDE split. During the LEDE split there was only one
+  release branch with the name "lede-17.01". After merging the LEDE fork with
   OpenWrt the release branches are named according to the following pattern
-  "openwrt-XX.YY" (e.g. openwrt-18.06).
+  "openwrt-XX.YY" (e.g. `openwrt-18.06`).
 - These branches are built with the respective OpenWrt release and are created
-  during the release stabilisation phase.
+  during the release stabilization phase.
 - Please ONLY cherry-pick or commit security and bug-fixes to these branches.
 - Do NOT add new packages and do NOT do major upgrades of packages here.
 - If you are unsure if your change is suitable, please use a pull request.
@@ -188,24 +205,56 @@ To simplify review and require less human resources, a CI tests all packages.
 Passing CI tests are not a hard requirement but a good indicator what the
 Buildbots will think about the proposed patch.
 
-The CI builds modified packages for multiple architectures using the latest
-snapshot SDK. For supported architectures (`aarch64_generic`,
-`arm_cortex-a15_neon-vfpv4`, `i386_pentium4` and `x86_64`) an additional
-runtime test is executed. A running OpenWrt is simulated which tries to install
-created packages and runs a script called `test.sh` located next to the package
-Makefile. The script is executed with the two arguments `PKG_NAME` and
-`PKG_VERSION`. The `PKG_NAME` can be used to distinguish package variants, e.g.
-`foobar` vs. `foobar-full`. The `PKG_VERSION` can be used for a trivial test
-checking if `foobar --version` prints the correct version. `PKG_VERSION` is the
-OpenWrt version and therefore includes the `PKG_RELEASE`, which isn't usually
-part of the running programs version.
+The CI builds modified packages for multiple
+architectures using the latest snapshot SDK. For supported architectures
+(`aarch64_generic`, `arm_cortex-a15_neon-vfpv4`, `i386_pentium-mmx`,
+`mips_24kc` and `x86_64`) an additional runtime test is executed inside a
+Docker container with QEMU user-mode emulation, simulating a running OpenWrt
+system.
 
-The following snippet show a script that tests different binaries, depending
-what IPK package was installed. The `gpsd` Makefile produces both a `gpsd` and
-a `gpsd-clients` IPK package.
+### Generic tests
+
+The CI automatically runs a set of **generic tests** on every installed
+package:
+
+- **Executable check** — verifies that files installed in standard executable
+  paths (`/usr/bin/`, `/usr/sbin/`, etc.) are actually executable.
+- **Version check** — attempts to detect the package version by running each
+  executable with common flags (`--version`, `-V`, `--help`, etc.) and checking
+  the output for `PKG_VERSION`.
+- **Hardcoded path check** — scans ELF binaries for leftover build directory
+  paths (`/build_dir/`).
+- **Strip check** — warns if ELF binaries are not stripped.
+- **Linked library check** — verifies that all shared library dependencies are
+  present on the system.
+- **SONAME check** — for libraries in standard library paths, verifies that the
+  SONAME is set correctly and the corresponding symlink exists.
+
+### Test scripts
+
+In addition to the generic tests, package maintainers can provide up to three
+optional shell scripts placed next to the package Makefile:
+
+#### `test.sh` — Functional test
+
+A package-specific functional test script that runs **in addition** to the
+generic tests. This is useful for verifying functionality that the generic
+checks cannot cover (e.g. importing a Python module, encrypting/decrypting
+data, or testing a specific command-line workflow). The following environment
+variables are available:
+
+| Variable      | Description                                            |
+| ------------- | ------------------------------------------------------ |
+| `PKG_NAME`    | Package name including variant (e.g. `foobar-full`)    |
+| `PKG_VERSION` | Upstream version without the OpenWrt release suffix    |
+| `CI_HELPERS`  | Path to `ci_helpers.sh` providing colored output utils |
+
+The following snippet shows a script that tests different binaries depending on
+what package was installed. The `gpsd` Makefile produces both a `gpsd` and
+a `gpsd-clients` package.
 
 ```shell
- #!/bin/sh
+#!/bin/sh
 
 case "$1" in
     "gpsd")
@@ -215,4 +264,48 @@ case "$1" in
         cgps -V 2>&1 | grep "$2"
         ;;
 esac
+```
+
+#### `test-version.sh` — Version check override
+
+When the generic version check cannot detect the version automatically (e.g.
+the binary does not support `--version` or reports it in a non-standard way),
+a `test-version.sh` script can override the version check logic. When this
+script is present, the generic version detection is skipped entirely and the
+script is responsible for verifying the version.
+
+The script receives `PKG_NAME` and `PKG_VERSION` as environment variables and
+should use a `case` statement to handle individual sub-packages. Packages that
+have no executable or cannot report their version should `exit 0`. Unknown
+packages should `exit 1`.
+
+```shell
+#!/bin/sh
+
+# shellcheck shell=busybox
+
+case "$PKG_NAME" in
+tor)
+    tor --version | grep -F "$PKG_VERSION"
+    ;;
+tor-geoip)
+    # Data-only package, no version to check
+    exit 0
+    ;;
+*)
+    echo "Untested package: $PKG_NAME" >&2
+    exit 1
+    ;;
+esac
+```
+
+#### `pre-test.sh` — Pre-test setup
+
+A script that runs **before** the package is installed. This can be used to
+install additional dependencies required for testing that are not part of the
+package itself.
+
+```shell
+#!/bin/sh
+apk add openssl-util
 ```

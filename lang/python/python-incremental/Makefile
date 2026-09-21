@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2018 OpenWrt.org
+# Copyright (C) 2018, 2021, 2023 Jeffery To
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -8,19 +8,24 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=python-incremental
-PKG_VERSION:=21.3.0
+PKG_VERSION:=24.11.0
 PKG_RELEASE:=1
 
 PYPI_NAME:=incremental
-PKG_HASH:=02f5de5aff48f6b9f665d99d48bfc7ec03b6e3943210de7cfc88856d755d6f57
+PKG_HASH:=87d3480dbb083c1d736222511a8cf380012a8176c2456d01ef483242abbbcf8c
 
 PKG_LICENSE:=MIT
 PKG_LICENSE_FILES:=LICENSE
-PKG_MAINTAINER:=Jeffery To <jeffery.to@gmail.com>
+PKG_MAINTAINER:=Alexandru Ardelean <ardeleanalex@gmail.com>
+
+HOST_BUILD_DEPENDS:=python3/host python-build/host python-installer/host python-hatchling/host
+PKG_BUILD_DEPENDS:=python3/host python-build/host python-installer/host python-hatchling/host
 
 include ../pypi.mk
 include $(INCLUDE_DIR)/package.mk
+include $(INCLUDE_DIR)/host-build.mk
 include ../python3-package.mk
+include ../python3-host-build.mk
 
 define Package/python3-incremental
   SECTION:=lang
@@ -28,13 +33,19 @@ define Package/python3-incremental
   SUBMENU:=Python
   TITLE:=Versions your Python projects
   URL:=https://github.com/twisted/incremental
-  DEPENDS:=+python3-light
+  DEPENDS:=+python3-light +python3-packaging
 endef
 
 define Package/python3-incremental/description
 Incremental is a small library that versions your Python projects.
 endef
 
+define Py3Package/python3-incremental/filespec
++|$(PYTHON3_PKG_DIR)
+-|$(PYTHON3_PKG_DIR)/incremental/tests
+endef
+
 $(eval $(call Py3Package,python3-incremental))
 $(eval $(call BuildPackage,python3-incremental))
 $(eval $(call BuildPackage,python3-incremental-src))
+$(eval $(call HostBuild))

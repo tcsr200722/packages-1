@@ -6,17 +6,16 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=expat
-PKG_VERSION:=2.4.1
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=2.8.2
+PKG_RELEASE:=1
 
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
-PKG_SOURCE_URL:=@SF/expat
-PKG_HASH:=cf032d0dba9b928636548e32b327a2d66b1aab63c4f4a13dd132c2d1d2f2fb6a
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
+PKG_SOURCE_URL:=https://github.com/libexpat/libexpat/releases/download/R_$(subst .,_,$(PKG_VERSION))
+PKG_HASH:=ef7d1994f533c9e7343d6c19f31064fc8ebbcbcaa144be3812b4f43052a05f4c
 
-PKG_MAINTAINER:=Ted Hess <thess@kitschensync.net>
 PKG_LICENSE:=MIT
 PKG_LICENSE_FILES:=COPYING
-PKG_CPE_ID:=cpe:/a:libexpat:expat
+PKG_CPE_ID:=cpe:/a:libexpat_project:libexpat
 
 CMAKE_INSTALL:=1
 
@@ -35,13 +34,10 @@ define Package/libexpat/description
 endef
 
 CMAKE_OPTIONS += \
-	-DDOCBOOK_TO_MAN=OFF \
 	-DEXPAT_BUILD_TOOLS=OFF \
 	-DEXPAT_BUILD_EXAMPLES=OFF \
 	-DEXPAT_BUILD_TESTS=OFF \
 	-DEXPAT_BUILD_DOCS=OFF \
-	-DEXPAT_WITH_LIBBSD=OFF \
-	-DEXPAT_ENABLE_INSTALL=ON \
 	-DEXPAT_DTD=OFF \
 	-DEXPAT_NS=OFF \
 	-DEXPAT_DEV_URANDOM=OFF

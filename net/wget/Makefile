@@ -8,14 +8,14 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=wget
-PKG_VERSION:=1.21.1
-PKG_RELEASE:=1
+PKG_VERSION:=1.25.0
+PKG_RELEASE:=5
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=@GNU/$(PKG_NAME)
-PKG_HASH:=59ba0bdade9ad135eda581ae4e59a7a9f25e3a4bde6a5419632b31906120e26e
+PKG_HASH:=766e48423e79359ea31e41db9e5c289675947a7fcf2efdcedb726ac9d0da3784
 
-PKG_MAINTAINER:=Peter Wagner <tripolar@gmx.at>
+PKG_MAINTAINER:=Alexandru Ardelean <ardeleanalex@gmail.com>
 PKG_LICENSE:=GPL-3.0-or-later
 PKG_LICENSE_FILES:=COPYING
 PKG_CPE_ID:=cpe:/a:gnu:wget
@@ -28,11 +28,11 @@ include $(INCLUDE_DIR)/package.mk
 define Package/wget/Default
   SECTION:=net
   CATEGORY:=Network
-  DEPENDS:=+libpcre +zlib
+  DEPENDS:=+libpcre2 +zlib
   SUBMENU:=File Transfer
   TITLE:=Non-interactive network downloader
   URL:=https://www.gnu.org/software/wget/index.html
-  PROVIDES:=gnu-wget wget
+  PROVIDES:=wget @wget-any
 endef
 
 define Package/wget/Default/description
@@ -50,8 +50,8 @@ $(call Package/wget/Default)
   TITLE+= (with SSL support)
   VARIANT:=ssl
   ALTERNATIVES:=\
-    300:/usr/bin/wget:/usr/libexec/wget-ssl \
-    300:/usr/bin/wget-ssl:/usr/libexec/wget-ssl
+    400:/usr/bin/wget:/usr/libexec/wget-ssl \
+    400:/usr/bin/wget-ssl:/usr/libexec/wget-ssl
 endef
 
 define Package/wget-ssl/description
@@ -64,8 +64,8 @@ $(call Package/wget/Default)
   TITLE+= (without SSL support)
   VARIANT:=nossl
   ALTERNATIVES:=\
-    300:/usr/bin/wget:/usr/libexec/wget-nossl \
-    300:/usr/bin/wget-nossl:/usr/libexec/wget-nossl
+    100:/usr/bin/wget:/usr/libexec/wget-nossl \
+    100:/usr/bin/wget-nossl:/usr/libexec/wget-nossl
 endef
 
 define Package/wget-nossl/description
@@ -76,7 +76,7 @@ endef
 CONFIGURE_ARGS+= \
 	--disable-rpath \
 	--disable-iri \
-	--disable-pcre2 \
+	--disable-ntlm \
 	--with-included-libunistring \
 	--without-libuuid \
 	--without-libpsl
@@ -95,7 +95,6 @@ endif
 
 ifeq ($(BUILD_VARIANT),nossl)
 	CONFIGURE_ARGS+= \
-		--disable-ntlm \
 		--without-ssl
 endif
 

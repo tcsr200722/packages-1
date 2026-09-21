@@ -5,116 +5,49 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=mosdns
-PKG_VERSION:=2.1.1
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=5.3.3
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/IrineSistiana/mosdns/tar.gz/v$(PKG_VERSION)?
-PKG_HASH:=fe7eaa076baa2064e58dc5697a1fceeef1dc3c4335585871ffabf29e7e14d3d1
+PKG_HASH:=1d7eeaa735cb48ed2d436797d7f2a82541699f74647cd293ee411a72cdc65f5f
 
 PKG_LICENSE:=GPL-3.0
-PKG_LICENSE_FILE:=LICENSE
+PKG_LICENSE_FILES:=LICENSE
 PKG_MAINTAINER:=Tianling Shen <cnsztl@immortalwrt.org>
-
-PKG_CONFIG_DEPENDS:= \
-	CONFIG_MOSDNS_COMPRESS_GOPROXY \
-	CONFIG_MOSDNS_COMPRESS_UPX
 
 PKG_BUILD_DEPENDS:=golang/host
 PKG_BUILD_PARALLEL:=1
-PKG_USE_MIPS16:=0
+PKG_BUILD_FLAGS:=no-mips16
 
 GO_PKG:=github.com/IrineSistiana/mosdns
-GO_PKG_LDFLAGS:=-s -w
 GO_PKG_LDFLAGS_X:=main.version=v$(PKG_VERSION)
 
 include $(INCLUDE_DIR)/package.mk
 include ../../lang/golang/golang-package.mk
 
-define Package/mosdns/Default
+define Package/mosdns
   SECTION:=net
   CATEGORY:=Network
   SUBMENU:=IP Addresses and Names
   TITLE:=A plug-in DNS forwarder/splitter
   URL:=https://github.com/IrineSistiana/mosdns
+  DEPENDS:=$(GO_ARCH_DEPENDS) +ca-bundle
+  PROVIDES:=mosdns-neo
 endef
 
-define Package/mosdns
-  $(call Package/mosdns/Default)
-  DEPENDS:=$(GO_ARCH_DEPENDS)
-endef
-
-define Package/mosdns-geodata
-  $(call Package/mosdns/Default)
-  TITLE+= (geodata resources)
-  DEPENDS:=mosdns
-endef
-
-define Package/mosdns/config
-config MOSDNS_COMPRESS_GOPROXY
-	bool "Compiling with GOPROXY proxy"
-	default n
-
-config MOSDNS_COMPRESS_UPX
-	bool "Compress executable files with UPX"
-	depends on !mips64
-	default y if mips||mipsel
-endef
-
-ifeq ($(CONFIG_MOSDNS_COMPRESS_GOPROXY),y)
-	export GO111MODULE=on
-	export GOPROXY=https://goproxy.baidu.com
-endif
-
-GEOIP_VER:=202110210032
-GEOIP_FILE:=geoip.dat.$(GEOIP_VER)
-
-define Download/geoip
-  URL:=https://github.com/v2fly/geoip/releases/download/$(GEOIP_VER)/
-  URL_FILE:=geoip.dat
-  FILE:=$(GEOIP_FILE)
-  HASH:=932cd484471f8066c040ab84a04fdd70df6c5cee99545de610e1f337bb696220
-endef
-
-GEOSITE_VER:=20211018134657
-GEOSITE_FILE:=dlc.dat.$(GEOSITE_VER)
-
-define Download/geosite
-  URL:=https://github.com/v2fly/domain-list-community/releases/download/$(GEOSITE_VER)/
-  URL_FILE:=dlc.dat
-  FILE:=$(GEOSITE_FILE)
-  HASH:=60b2388b11f1f9b6e14794fbacdf3bf693e3101e3ec651ce5423d8caceda5497
-endef
-
-define Build/Prepare
-	$(call Build/Prepare/Default)
-ifneq ($(CONFIG_PACKAGE_mosdns-geodata),)
-	$(call Download,geoip)
-	$(call Download,geosite)
-endif
-endef
-
-GO_PKG_TARGET_VARS:=$(filter-out CGO_ENABLED=%,$(GO_PKG_TARGET_VARS)) CGO_ENABLED=0
-
-define Build/Compile
-	$(call GoPackage/Build/Compile)
-ifneq ($(CONFIG_MOSDNS_COMPRESS_UPX),)
-	$(STAGING_DIR_HOST)/bin/upx --lzma --best $(GO_PKG_BUILD_BIN_DIR)/mosdns
-endif
+define Package/mosdns/conffiles
+/etc/mosdns/
 endef
 
 define Package/mosdns/install
 	$(call GoPackage/Package/Install/Bin,$(1))
+
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/scripts/openwrt/mosdns-init-openwrt $(1)/etc/init.d/mosdns
+
 	$(INSTALL_DIR) $(1)/etc/mosdns
 	$(INSTALL_DATA) ./files/config.yaml $(1)/etc/mosdns/config.yaml
-endef
-
-define Package/mosdns-geodata/install
-	$(INSTALL_DIR) $(1)/etc/mosdns
-	$(INSTALL_DATA) $(DL_DIR)/$(GEOIP_FILE) $(1)/etc/mosdns/geoip.dat
-	$(INSTALL_DATA) $(DL_DIR)/$(GEOSITE_FILE) $(1)/etc/mosdns/geosite.dat
 endef
 
 define Package/mosdns/postinst
@@ -130,4 +63,3 @@ endef
 
 $(eval $(call GoBinPackage,mosdns))
 $(eval $(call BuildPackage,mosdns))
-$(eval $(call BuildPackage,mosdns-geodata))

@@ -8,16 +8,18 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=python-lxml
-PKG_VERSION:=4.6.3
+PKG_VERSION:=6.1.1
 PKG_RELEASE:=1
 
 PYPI_NAME:=lxml
-PKG_HASH:=39b78571b3b30645ac77b95f7c69d1bffc4cf8c3b157c435a34da72e78c82468
+PKG_HASH:=ba96ae44888e0185281e937633a743ea90d5a196c6000f82565ebb0580012d40
 
 PKG_LICENSE:=BSD-3-Clause
 PKG_LICENSE_FILES:=LICENSES.txt
 PKG_MAINTAINER:=Alexandru Ardelean <ardeleanalex@gmail.com>
 PKG_CPE_ID:=cpe:/a:lxml:lxml
+
+PKG_BUILD_DEPENDS:=python-cython/host
 
 include ../pypi.mk
 include $(INCLUDE_DIR)/package.mk

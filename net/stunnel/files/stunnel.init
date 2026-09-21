@@ -76,7 +76,7 @@ validate_service_options() {
 		'OCSPflag:list(or("NOCASIGN","NOCERTS","NOCHAIN","NOCHECKS","NODELEGATED","NOEXPLICIT","NOINTERN","NOSIGS","NOTIME","NOVERIFY","RESPID_KEY","TRUSTOTHER"))' \
 		'OCSPnonce:bool' \
 		'options:list(string)	' \
-		'protocol:or("cifs","connect","imap","nntp","pgsql","pop3","proxy","smtp","socks")' \
+		'protocol:or("cifs","capwin","capwinctrl","connect","imap","nntp","pgsql","pop3","proxy","smtp","socks")' \
 		'protocolAuthentication:or("basic","login","ntlm","plain")' \
 		'protocolDomain:hostname' \
 		'protocolHost_host:host' \
@@ -95,6 +95,7 @@ validate_service_options() {
 		'service:string' \
 		'sessionCacheSize:uinteger' \
 		'sessionCacheTimeout:uinteger' \
+		'sessionResume:bool' \
 		'sessiond_host:host' \
 		'sessiond_port:port' \
 		'sni:list(string)' \
@@ -282,6 +283,7 @@ print_service_options() {
 		retry \
 		verifyChain \
 		verifyPeer \
+		sessionResume \
 		;
 
 	print_lists_map \
@@ -336,6 +338,11 @@ global_defs() {
 	# If the first globals section has alt_config_file, don't process any more globals
 	[ -z "$HAVE_ALT_CONF_FILE" ] || return 0
 
+	pid_dir="$(dirname "$PID_FILE")"
+	mkdir -p "$pid_dir"
+	[ -z "$setuid" ] || chown "$setuid" "$pid_dir"
+	[ -z "$setgid" ] || chown ":$setgid" "$pid_dir"
+
 	# If "alt_config_file" specified in the first globals section, use that instead
 	[ -z "$alt_config_file" ] || [ -n "$CONF_FILE_CREATED" ] || {
 		# Symlink "alt_config_file" since it's a bit easier and safer
@@ -346,11 +353,6 @@ global_defs() {
 		HAVE_ALT_CONF_FILE=1
 		return 0
 	}
-
-	pid_dir="$(dirname "$PID_FILE")"
-	mkdir -p "$pid_dir"
-	[ -z "$setuid" ] || chown "$setuid" "$pid_dir"
-	[ -z "$setgid" ] || chown ":$setgid" "$pid_dir"
 
 	create_conf_file
 	print_global_options

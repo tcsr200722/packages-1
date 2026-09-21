@@ -6,28 +6,29 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=zerotier
-PKG_VERSION:=1.8.1
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=1.16.2
+PKG_RELEASE:=1
 
-PKG_SOURCE_PROTO:=git
-PKG_SOURCE_URL:=https://github.com/zerotier/ZeroTierOne.git
-PKG_SOURCE_DATE:=2021-11-05
-PKG_SOURCE_VERSION:=7a626abf156a9dbac45a14061e5e1a182083a61c
-PKG_MIRROR_HASH:=b98ca72e72ee4ad8f9fed2ddb14599c94a9e78fd5f44fd9920b4b0e5c6f9dcf7
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
+PKG_SOURCE_URL:=https://codeload.github.com/zerotier/ZeroTierOne/tar.gz/$(PKG_VERSION)?
+PKG_HASH:=2c607f573c6e38815433af289d364a689a203b18b51125f06c4472014d0657f0
+PKG_BUILD_DIR:=$(BUILD_DIR)/ZeroTierOne-$(PKG_VERSION)
 
 PKG_MAINTAINER:=Moritz Warning <moritzwarning@web.de>
-PKG_LICENSE:=BSL 1.1
+PKG_LICENSE:=MPL-2.0
 PKG_LICENSE_FILES:=LICENSE.txt
+PKG_CPE_ID:=cpe:/a:zerotier:zerotierone
 
 PKG_ASLR_PIE:=0
 PKG_BUILD_PARALLEL:=1
+PKG_BUILD_FLAGS:=gc-sections
 
 include $(INCLUDE_DIR)/package.mk
 
 define Package/zerotier
   SECTION:=net
   CATEGORY:=Network
-  DEPENDS:=+libpthread +libstdcpp +kmod-tun +ip +libminiupnpc +libnatpmp
+  DEPENDS:=+libpthread +libstdcpp +kmod-tun +ip +libminiupnpc +libnatpmp +libatomic
   TITLE:=Create flat virtual Ethernet networks of almost unlimited size
   URL:=https://www.zerotier.com
   SUBMENU:=VPN
@@ -46,8 +47,11 @@ MAKE_FLAGS += ZT_DEBUG=1
 endif
 
 MAKE_FLAGS += \
+	ZT_EMBEDDED=1 \
+	ZT_SSO_SUPPORTED=0 \
+	ZT_NONFREE=0 \
 	DEFS="" \
-	OS_TYPE="LINUX" \
+	OSTYPE="Linux" \
 
 define Build/Compile
 	$(call Build/Compile/Default,one)
@@ -57,11 +61,16 @@ endif
 endef
 
 # Make binary smaller
-TARGET_CFLAGS += -ffunction-sections -fdata-sections
-TARGET_LDFLAGS += -Wl,--gc-sections,--as-needed
+TARGET_CFLAGS += -Wl,-z,noexecstack
+TARGET_LDFLAGS += -Wl,--as-needed -Wl,-z,noexecstack
+
+# Prevent `-isystem ext` from causing the wrong miniupnpc header to be used (OpenWrt packages issue - 18019)
+TARGET_CFLAGS += -isystem $(STAGING_DIR)/usr/include
 
 define Package/zerotier/conffiles
 /etc/config/zerotier
+/etc/zerotier.conf
+/etc/zerotier
 endef
 
 define Package/zerotier/install
@@ -69,13 +78,12 @@ define Package/zerotier/install
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/zerotier-one $(1)/usr/bin/
 	$(LN) zerotier-one $(1)/usr/bin/zerotier-cli
 	$(LN) zerotier-one $(1)/usr/bin/zerotier-idtool
+	$(INSTALL_DIR) $(1)/etc/uci-defaults
 
 ifeq ($(CONFIG_ZEROTIER_ENABLE_SELFTEST),y)
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/zerotier-selftest $(1)/usr/bin/
 endif
-	#$(CP) ./files/* $(1)/
-	$(INSTALL_DIR) $(1)/etc/config
-	$(INSTALL_CONF) ./files/etc/config/zerotier $(1)/etc/config/zerotier
+	$(CP) ./files/* $(1)/
 endef
 
 $(eval $(call BuildPackage,zerotier))

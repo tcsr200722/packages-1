@@ -8,17 +8,18 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=python-pytest-xdist
-PKG_VERSION:=2.2.1
+PKG_VERSION:=3.8.0
 PKG_RELEASE:=1
 
 PYPI_NAME:=pytest-xdist
-PKG_HASH:=718887296892f92683f6a51f25a3ae584993b06f7076ce1e1fd482e59a8220a2
+PYPI_SOURCE_NAME:=pytest_xdist
+PKG_HASH:=7e578125ec9bc6050861aa93f2d59f1d8d085595d6551c2c90b6f4fad8d3a9f1
 
-PKG_MAINTAINER:=Jan Pavlinec <jan.pavlinec1@gmail.com>
+PKG_MAINTAINER:=Alexandru Ardelean <ardeleanalex@gmail.com>
 PKG_LICENSE:=MIT
 PKG_LICENSE_FILES:=LICENSE
 
-HOST_PYTHON3_PACKAGE_BUILD_DEPENDS:=setuptools-scm
+PKG_BUILD_DEPENDS:=python-setuptools-scm/host
 
 include ../pypi.mk
 include $(INCLUDE_DIR)/package.mk
@@ -28,18 +29,19 @@ define Package/python3-pytest-xdist
   SUBMENU:=Python
   SECTION:=lang
   CATEGORY:=Languages
-  TITLE:=Pytest plugin for parallel test running
+  TITLE:=pytest plugin for distributed testing
   URL:=https://github.com/pytest-dev/pytest-xdist
   DEPENDS:= \
 	+python3-light \
-	+python3-pytest \
-	+python3-pytest-forked \
-	+python3-execnet
+	+python3-uuid \
+	+python3-execnet \
+	+python3-pytest
 endef
 
 define Package/python3-pytest-xdist/description
-  The pytest framework makes it easy to write small tests, yet scales to support
-  complex functional testing for applications and libraries.
+The pytest-xdist plugin extends pytest with new test execution modes,
+the most used being distributing tests across multiple CPUs to speed up
+test execution.
 endef
 
 $(eval $(call Py3Package,python3-pytest-xdist))

@@ -1,14 +1,15 @@
 include $(TOPDIR)/rules.mk
 
-PKG_NAME:=botocore
-PKG_VERSION:=1.12.66
-PKG_RELEASE:=2
+PKG_NAME:=python-botocore
+PKG_VERSION:=1.43.67
+PKG_RELEASE:=1
 
-PYPI_NAME:=$(PKG_NAME)
-PKG_HASH:=25c39ecc71356287cf79d66981ec77deca374e28043b19b2f818d48aa34272a1
+PYPI_NAME:=botocore
+PKG_HASH:=6fe5cfa0c8676ba809efe505b618ec00f30d1af2d014bf316a7aa4ee86accb20
 
-PKG_MAINTAINER:=Daniel Danzberger <daniel@dd-wrt.com>
-PKG_LICENSE:=MIT
+PKG_MAINTAINER:=Alexandru Ardelean <ardeleanalex@gmail.com>
+PKG_LICENSE:=Apache-2.0
+PKG_LICENSE_FILES:=LICENSE.txt
 
 include ../pypi.mk
 include $(INCLUDE_DIR)/package.mk
@@ -18,19 +19,17 @@ define Package/python3-botocore
   SUBMENU:=Python
   SECTION:=lang
   CATEGORY:=Languages
-  TITLE:=botocore
+  TITLE:=Low-level, data-driven core of boto 3
   URL:=https://github.com/boto/botocore
   DEPENDS:=+python3 \
-	+python3-urllib3 \
-	+python3-docutils \
 	+python3-dateutil \
 	+python3-jmespath \
-	+python3-requests
+	+python3-urllib3
 endef
 
 define Package/python3-botocore/description
-A low-level interface to a growing number of Amazon Web Services.
-The botocore package is the foundation for the AWS CLI as well as boto3.
+A low-level interface to a growing number of Amazon Web Services. The
+botocore package is the foundation for the AWS CLI as well as boto3.
 endef
 
 $(eval $(call Py3Package,python3-botocore))

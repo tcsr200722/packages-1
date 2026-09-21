@@ -5,47 +5,26 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=dnslookup
-PKG_VERSION:=1.5.1
-PKG_RELEASE:=$(AUTORELESE)
+PKG_VERSION:=1.12.0
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/ameshkov/dnslookup/tar.gz/v$(PKG_VERSION)?
-PKG_HASH:=b09fc07d917cfe3d5b08bdf2e92aa9ee63928d86e3477724656dae5a50683c45
+PKG_HASH:=de4b851a21556811f26739b480fedd2c9e4fd0b238f4a4e20143e1f64b42474f
 
 PKG_MAINTAINER:=Tianling Shen <cnsztl@immortalwrt.org>
 PKG_LICENSE:=MIT
 PKG_LICENSE_FILES:=LICENSE
 
-PKG_CONFIG_DEPENDS:= \
-	CONFIG_DNSLOOKUP_COMPRESS_GOPROXY \
-	CONFIG_DNSLOOKUP_COMPRESS_UPX
-
 PKG_BUILD_DEPENDS:=golang/host
 PKG_BUILD_PARALLEL:=1
-PKG_USE_MIPS16:=0
+PKG_BUILD_FLAGS:=no-mips16
 
 GO_PKG:=github.com/ameshkov/dnslookup
-GO_PKG_LDFLAGS:=-s -w
 GO_PKG_LDFLAGS_X:=main.VersionString=v$(PKG_VERSION)
 
 include $(INCLUDE_DIR)/package.mk
 include ../../lang/golang/golang-package.mk
-
-define Package/dnslookup/config
-config DNSLOOKUP_COMPRESS_GOPROXY
-	bool "Compiling with GOPROXY proxy"
-	default n
-
-config DNSLOOKUP_COMPRESS_UPX
-	bool "Compress executable files with UPX"
-	depends on !mips64
-	default y if mips||mipsel
-endef
-
-ifeq ($(CONFIG_DNSLOOKUP_COMPRESS_GOPROXY),y)
-	export GO111MODULE=on
-	export GOPROXY=https://goproxy.baidu.com
-endif
 
 define Package/dnslookup
   SECTION:=net
@@ -59,13 +38,6 @@ endef
 define Package/dnslookup/description
   Simple command line utility to make DNS lookups.
   Supports all known DNS protocols: plain DNS, DoH, DoT, DoQ, DNSCrypt.
-endef
-
-define Build/Compile
-	$(call GoPackage/Build/Compile)
-ifeq ($(CONFIG_DNSLOOKUP_COMPRESS_UPX),y)
-	$(STAGING_DIR_HOST)/bin/upx --lzma --best $(GO_PKG_BUILD_BIN_DIR)/dnslookup
-endif
 endef
 
 $(eval $(call GoBinPackage,dnslookup))

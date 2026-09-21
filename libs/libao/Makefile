@@ -9,16 +9,17 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libao
 PKG_VERSION:=1.2.0
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=http://downloads.xiph.org/releases/ao/
+PKG_SOURCE_URL:=https://downloads.xiph.org/releases/ao/
 PKG_HASH:=03ad231ad1f9d64b52474392d63c31197b0bc7bd416e58b1c10a329a5ed89caf
 
 PKG_MAINTAINER:=Ted Hess <thess@kitschensync.net>
 
 PKG_LICENSE:=GPL-2.0
 PKG_LICENSE_FILES:=COPYING
+PKG_CPE_ID:=cpe:/a:xiph:libao
 
 PKG_FIXUP:=autoreconf
 PKG_INSTALL:=1
@@ -30,7 +31,7 @@ define Package/libao
   DEPENDS:=+alsa-lib
   CATEGORY:=Libraries
   TITLE:=A cross platform audio library
-  URL:=http://www.xiph.org/ao/
+  URL:=https://www.xiph.org/ao/
 endef
 
 define Package/libao/description

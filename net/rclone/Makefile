@@ -6,29 +6,25 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=rclone
-PKG_VERSION:=1.57.0
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=1.75.0
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/rclone/rclone/tar.gz/v$(PKG_VERSION)?
-PKG_HASH:=294f7a6b0874509997d3a9ffae7c74f0c45b687df0ac7d7742f284ad3814fe55
+PKG_HASH:=1292c5fae9d10d6df3ea0c2ba96de42336e96e2e878729af1f02f86900434ee0
 
 PKG_LICENSE:=MIT
-PKG_LICENSE_FILE:=LICENSE
+PKG_LICENSE_FILES:=LICENSE
 PKG_MAINTAINER:=Elon Huang <elonhhuang@gmail.com> \
 		Tianling Shen <cnsztl@immortalwrt.org>
-
-PKG_CONFIG_DEPENDS:= \
-	CONFIG_RCLONE_COMPRESS_GOPROXY \
-	CONFIG_RCLONE_COMPRESS_UPX
+PKG_CPE_ID:=cpe:/a:rclone:rclone
 
 PKG_BUILD_DEPENDS:=golang/host
 PKG_BUILD_PARALLEL:=1
-PKG_USE_MIPS16:=0
+PKG_BUILD_FLAGS:=no-mips16
 
 GO_PKG:=github.com/rclone/rclone
 GO_PKG_EXCLUDES:=test
-GO_PKG_LDFLAGS:=-s -w
 GO_PKG_LDFLAGS_X:= \
 	github.com/rclone/rclone/fs.Version=v$(PKG_VERSION) \
 	main.Version=v$(PKG_VERSION) \
@@ -48,11 +44,12 @@ endef
 
 define Package/rclone
   $(call Package/rclone/Default)
-  DEPENDS:=$(GO_ARCH_DEPENDS) +ca-bundle +fuse-utils
+  DEPENDS:=$(GO_ARCH_DEPENDS) +ca-bundle +fuse3-utils
   USERID:=rclone:rclone
 endef
 
 define Package/rclone-config
+  $(call Package/rclone/Default)
   TITLE+= (Config Scripts)
   DEPENDS:=+rclone
 endef
@@ -62,31 +59,8 @@ define Package/rclone/description
   files and directories to and from different cloud storage providers.
 endef
 
-define Package/rclone/config
-config RCLONE_COMPRESS_GOPROXY
-	bool "Compiling with GOPROXY proxy"
-	default n
-
-config RCLONE_COMPRESS_UPX
-	bool "Compress executable files with UPX"
-	depends on !mips64
-	default n
-endef
-
-ifeq ($(CONFIG_RCLONE_COMPRESS_GOPROXY),y)
-	export GO111MODULE=on
-	export GOPROXY=https://goproxy.baidu.com
-endif
-
 define Package/rclone-config/conffiles
 /etc/config/rclone
-endef
-
-define Build/Compile
-	$(call GoPackage/Build/Compile)
-ifeq ($(CONFIG_RCLONE_COMPRESS_UPX),y)
-	$(STAGING_DIR_HOST)/bin/upx --lzma --best $(GO_PKG_BUILD_BIN_DIR)/rclone
-endif
 endef
 
 define Package/rclone/install

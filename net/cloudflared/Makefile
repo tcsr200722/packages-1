@@ -5,68 +5,60 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=cloudflared
-PKG_VERSION:=2021.11.0
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=2026.8.3
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/cloudflare/cloudflared/tar.gz/$(PKG_VERSION)?
-PKG_HASH:=12b0f4cd3c82ad78375a9ded491453bb3fac868ec485091a43bec709848a7872
+PKG_HASH:=04cd85af52c2c012f08212c878b4c403eadf410865f2356a80f361d475d2fc92
 
-PKG_LICENSE:=Proprietary
+PKG_LICENSE:=Apache-2.0
 PKG_LICENSE_FILES:=LICENSE
 PKG_MAINTAINER:=Tianling Shen <cnsztl@immortalwrt.org>
 
-PKG_CONFIG_DEPENDS:= \
-	CONFIG_CLOUDFLARED_COMPRESS_GOPROXY \
-	CONFIG_CLOUDFLARED_COMPRESS_UPX
-
 PKG_BUILD_DEPENDS:=golang/host
 PKG_BUILD_PARALLEL:=1
-PKG_USE_MIPS16:=0
+PKG_BUILD_FLAGS:=no-mips16
 
 GO_PKG:=github.com/cloudflare/cloudflared
-GO_PKG_LDFLAGS:=-s -w
 GO_PKG_LDFLAGS_X:=main.Version=$(PKG_VERSION)
 
 include $(INCLUDE_DIR)/package.mk
 include ../../lang/golang/golang-package.mk
 
-define Package/cloudflared/config
-config CLOUDFLARED_COMPRESS_GOPROXY
-	bool "Compiling with GOPROXY proxy"
-	default n
-
-config CLOUDFLARED_COMPRESS_UPX
-	bool "Compress executable files with UPX"
-	depends on !mips64
-	default y if mips||mipsel
-endef
-
-ifeq ($(CONFIG_CLOUDFLARED_COMPRESS_GOPROXY),y)
-	export GO111MODULE=on
-	export GOPROXY=https://goproxy.baidu.com
-endif
-
 define Package/cloudflared
   SECTION:=net
   CATEGORY:=Network
-  TITLE:=Argo Tunnel client
-  URL:=https://developers.cloudflare.com/argo-tunnel/
+  SUBMENU:=Web Servers/Proxies
+  TITLE:=Cloudflare Tunnel client
+  URL:=https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/get-started/
   DEPENDS:=$(GO_ARCH_DEPENDS) +ca-bundle
 endef
 
 define Package/cloudflared/description
-  Contains the command-line client for Argo Tunnel, a tunneling daemon
-  that proxies any local webserver through the Cloudflare network.
-  Extensive documentation can be found in the Argo Tunnel section of
-  the Cloudflare Docs.
+  Contains the command-line client for Cloudflare Tunnel, a tunneling
+  daemon that proxies traffic from the Cloudflare network to your origins.
+
+  This daemon sits between Cloudflare network and your origin (e.g. a
+  webserver). Cloudflare attracts client requests and sends them to you
+  via this daemon, without requiring you to poke holes on your firewall
+  --- your origin can remain as closed as possible.
 endef
 
-define Build/Compile
-	$(call GoPackage/Build/Compile)
-ifeq ($(CONFIG_CLOUDFLARED_COMPRESS_UPX),y)
-	$(STAGING_DIR_HOST)/bin/upx --lzma --best $(GO_PKG_BUILD_BIN_DIR)/cloudflared
-endif
+define Package/cloudflared/conffiles
+/etc/config/cloudflared
+/etc/cloudflared/
+endef
+
+define Package/cloudflared/install
+	$(call GoPackage/Package/Install/Bin,$(1))
+
+	$(INSTALL_DIR) $(1)/etc/cloudflared/
+	$(INSTALL_CONF) $(CURDIR)/files/sample_config.yml $(1)/etc/cloudflared/config.yml
+	$(INSTALL_DIR) $(1)/etc/config/
+	$(INSTALL_CONF) $(CURDIR)/files/cloudflared.config $(1)/etc/config/cloudflared
+	$(INSTALL_DIR) $(1)/etc/init.d/
+	$(INSTALL_BIN) $(CURDIR)/files/cloudflared.init $(1)/etc/init.d/cloudflared
 endef
 
 $(eval $(call GoBinPackage,cloudflared))

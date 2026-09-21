@@ -8,14 +8,14 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=ldns
-PKG_VERSION:=1.7.1
-PKG_RELEASE:=3
+PKG_VERSION:=1.9.2
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=http://www.nlnetlabs.nl/downloads/ldns
-PKG_HASH:=8ac84c16bdca60e710eea75782356f3ac3b55680d40e1530d7cea474ac208229
+PKG_SOURCE_URL:=https://www.nlnetlabs.nl/downloads/ldns
+PKG_HASH:=b524fa21994b6e834200ceb8c27f1b84bda5982fe35706f058196c079db94d5d
 
-PKG_MAINTAINER:=Eric Luehrsen <ericluehrsen@gmail.com>
+PKG_MAINTAINER:=
 PKG_LICENSE:=BSD-3-Clause
 PKG_LICENSE_FILES:=LICENSE
 PKG_CPE_ID:=cpe:/a:nlnetlabs:ldns
@@ -27,7 +27,7 @@ PKG_BUILD_PARALLEL:=1
 include $(INCLUDE_DIR)/package.mk
 
 define Package/libldns/Default
-  URL:=http://www.nlnetlabs.nl/projects/ldns/
+  URL:=https://www.nlnetlabs.nl/projects/ldns/about/
   DEPENDS:=+libopenssl
 endef
 

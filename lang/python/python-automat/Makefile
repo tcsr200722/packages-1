@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2018 OpenWrt.org
+# Copyright (C) 2018-2020, 2023 Jeffery To
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -8,22 +8,21 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=python-automat
-PKG_VERSION:=20.2.0
+PKG_VERSION:=25.4.16
 PKG_RELEASE:=2
 
-PYPI_NAME:=Automat
-PKG_HASH:=7979803c74610e11ef0c0d68a2942b152df52da55336e0c9d58daf1831cbdf33
+PYPI_NAME:=automat
+PKG_HASH:=0017591a5477066e90d26b0e696ddc143baafd87b588cfac8100bc6be9634de0
 
 PKG_LICENSE:=MIT
 PKG_LICENSE_FILES:=LICENSE
-PKG_MAINTAINER:=Jeffery To <jeffery.to@gmail.com>
+PKG_MAINTAINER:=Alexandru Ardelean <ardeleanalex@gmail.com>
+
+PKG_BUILD_DEPENDS:=python-setuptools-scm/host
 
 include ../pypi.mk
 include $(INCLUDE_DIR)/package.mk
 include ../python3-package.mk
-
-PYTHON3_PKG_SETUP_VARS:= \
-  PKG_VERSION="$(PKG_VERSION)"
 
 define Package/python3-automat
   SECTION:=lang
@@ -33,8 +32,7 @@ define Package/python3-automat
   URL:=https://github.com/glyph/Automat
   DEPENDS:= \
       +python3-light \
-      +python3-attrs \
-      +python3-six
+      +python3-attrs
 endef
 
 define Package/python3-automat/description
@@ -46,6 +44,12 @@ endef
 define Py3Package/python3-automat/filespec
 +|$(PYTHON3_PKG_DIR)
 -|$(PYTHON3_PKG_DIR)/automat/_visualize.py
+endef
+
+# Drop the automat-visualize binary: it imports automat._visualize,
+# which is excluded above because it needs the optional graphviz dependency.
+define Py3Package/python3-automat/install
+	:
 endef
 
 $(eval $(call Py3Package,python3-automat))

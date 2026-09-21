@@ -15,9 +15,11 @@ PKG_HASH:=406b5003523577d39da66767adfe54f7af9b701374363729386f32f6a3a995f4
 
 PKG_MAINTAINER:=ghostmaker
 PKG_LICENSE:=BSD-3-Clause
-PKG_LICENSE_FILE:=LICENSE
+PKG_LICENSE_FILES:=LICENSE
 
 include $(INCLUDE_DIR)/package.mk
+
+UNZIP_CMD:=unzip -q -d $(PKG_BUILD_DIR) $(DL_DIR)/$(PKG_SOURCE)
 
 define Package/dns2socks
   SECTION:=net
@@ -29,11 +31,9 @@ define Package/dns2socks
 endef
 
 define Package/dns2socks/description
-  This is a command line utility to resolve DNS requests via 
+  This is a command line utility to resolve DNS requests via
   a SOCKS tunnel like Tor or a HTTP proxy.
 endef
-
-UNZIP_CMD:=unzip -q -d $(PKG_BUILD_DIR) $(DL_DIR)/$(PKG_SOURCE)
 
 define Build/Compile
 	$(TARGET_CC) \

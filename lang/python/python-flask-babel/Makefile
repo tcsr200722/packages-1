@@ -8,15 +8,18 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=python-flask-babel
-PKG_VERSION:=2.0.0
+PKG_VERSION:=4.0.0
 PKG_RELEASE:=1
 
-PYPI_NAME:=Flask-Babel
-PKG_HASH:=f9faf45cdb2e1a32ea2ec14403587d4295108f35017a7821a2b1acb8cfd9257d
+PYPI_NAME:=flask-babel
+PYPI_SOURCE_NAME:=flask_babel
+PKG_HASH:=dbeab4027a3f4a87678a11686496e98e1492eb793cbdd77ab50f4e9a2602a593
 
-PKG_MAINTAINER:=Josef Schlehofer <josef.schlehofer@nic.cz>
+PKG_MAINTAINER:=Josef Schlehofer <pepe.schlehofer@gmail.com>
 PKG_LICENSE:=BSD-3-Clause
 PKG_LICENSE_FILES:=LICENSE
+
+PKG_BUILD_DEPENDS:=python-poetry-core/host
 
 include ../pypi.mk
 include $(INCLUDE_DIR)/package.mk
@@ -26,7 +29,7 @@ define Package/python3-flask-babel
   SECTION:=lang
   CATEGORY:=Languages
   SUBMENU:=Python
-  TITLE:=Flask Babel
+  TITLE:=i18n/l10n support for Flask applications
   URL:=https://github.com/python-babel/flask-babel
   DEPENDS:= \
     +python3-light \

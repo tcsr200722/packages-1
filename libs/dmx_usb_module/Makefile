@@ -10,7 +10,7 @@ include $(INCLUDE_DIR)/kernel.mk
 
 PKG_NAME:=dmx_usb_module
 PKG_VERSION:=19.12.1
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/lowlander/dmx_usb_module/tar.gz/V$(PKG_VERSION)?
@@ -26,7 +26,7 @@ define KernelPackage/usb-serial-dmx_usb_module
 	CATEGORY:=Kernel modules
 	SUBMENU:=USB Support
 	TITLE:=Support for FTDI RS485 based DMX modules
-	URL:=http://www.erwinrol.com/open-dmx-usb-linux-driver/
+	URL:=https://www.erwinrol.com/page/projects/open-dmx-usb/
 	FILES:=$(PKG_BUILD_DIR)/dmx_usb.$(LINUX_KMOD_SUFFIX)
 	AUTOLOAD:=$(call AutoProbe,dmx_usb)
 	DEPENDS+=kmod-usb-serial

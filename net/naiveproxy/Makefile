@@ -5,20 +5,22 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=naiveproxy
-PKG_VERSION:=95.0.4638.54-3
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_REAL_VERSION:=143.0.7499.109-2
+PKG_VERSION:=$(subst -,.,$(PKG_REAL_VERSION))
+PKG_RELEASE:=1
 
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://codeload.github.com/klzgrad/naiveproxy/tar.gz/v$(PKG_VERSION)?
-PKG_HASH:=2489bffda3e0a993cf7e4e8dd6bb5d99e5793c49251ee7dad8612214a3badd03
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_REAL_VERSION).tar.gz
+PKG_SOURCE_URL:=https://codeload.github.com/klzgrad/naiveproxy/tar.gz/v$(PKG_REAL_VERSION)?
+PKG_HASH:=07e3a44a73c92cc9df347b12a23a2420458b31917a7f6dfdb06e18590d9c1aea
+PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_REAL_VERSION)
 
 PKG_LICENSE:=BSD 3-Clause
 PKG_LICENSE_FILES:=LICENSE
 PKG_MAINTAINER:=Tianling Shen <cnsztl@immortalwrt.org>
 
-PKG_BUILD_DEPENDS:=python3/host
-PKG_USE_MIPS16:=0
+PKG_BUILD_DEPENDS:=gn/host
 PKG_BUILD_PARALLEL:=1
+PKG_BUILD_FLAGS:=no-mips16
 
 ifneq ($(CONFIG_CPU_TYPE)," ")
   CPU_TYPE:=$(word 1, $(subst +," ,$(CONFIG_CPU_TYPE)))
@@ -37,9 +39,9 @@ define Package/naiveproxy
   SECTION:=net
   CATEGORY:=Network
   SUBMENU:=Web Servers/Proxies
-  URL:=https://github.com/klzgrad/naiveproxy
   TITLE:=Make a fortune quietly
-  DEPENDS:=@!(arc||armeb||mips||mips64||powerpc||TARGET_gemini) +libatomic
+  URL:=https://github.com/klzgrad/naiveproxy
+  DEPENDS:=@!(arc||armeb||loongarch64||mips||mips64||powerpc||TARGET_gemini) +libatomic
 endef
 
 define Package/naiveproxy/description
@@ -55,56 +57,50 @@ ifneq ($(CONFIG_CCACHE),)
   export naive_ccache_flags=cc_wrapper="$(CCACHE)"
 endif
 
-CLANG_VER:=14-init-3191-g0e03450a-1
-CLANG_FILE:=clang-llvmorg-$(CLANG_VER).tgz
+CLANG_VER:=22-init-8940-g4d4cb757-84
+CLANG_FILE:=clang-llvmorg-$(CLANG_VER).tar.xz
 define Download/CLANG
 	URL:=https://commondatastorage.googleapis.com/chromium-browser-clang/Linux_x64
 	URL_FILE:=$(CLANG_FILE)
 	FILE:=$(CLANG_FILE)
-	HASH:=dd7479d43ce61401e057a5dee8b7e32bc2bd0d0e15d4f46c6858daf9170c9978
+	HASH:=f6a487ffd0e56ba7a39b063d85d1f8ff7846514f50635785730cffb7368872ce
 endef
 
-GN_VER:=69ec4fca1fa69ddadae13f9e6b7507efa0675263
-GN_FILE:=gn-git_revision-$(GN_VER).zip
-define Download/GN_TOOL
-	URL:=https://chrome-infra-packages.appspot.com/dl/gn/gn/linux-amd64/+
-	URL_FILE:=git_revision:$(GN_VER)
-	FILE:=$(GN_FILE)
-	HASH:=8bedd600ac58311f384e5113ab6a544bc72edb587ccb8f9e784c4dff208872c4
-endef
-
-PGO_VER:=4638-1634308623-72bf2d0e0b11b9cb785718016169434ba1d25ee3
+PGO_VER:=7499-1764697213-c882935fa3cd65518c410503710d1c1528e41260-abb34356235cd297f57c1bb9c272d7f54dbe3bd8
 PGO_FILE:=chrome-linux-$(PGO_VER).profdata
 define Download/PGO_PROF
-	URL:=https://storage.googleapis.com.cnpmjs.org/chromium-optimization-profiles/pgo_profiles \
-	     https://storage.googleapis.com/chromium-optimization-profiles/pgo_profiles
+	URL:=https://storage.googleapis.com/chromium-optimization-profiles/pgo_profiles
 	URL_FILE:=$(PGO_FILE)
 	FILE:=$(PGO_FILE)
-	HASH:=252703067ad0897cc0f39f618eb792b0899769bb0e1b715b64bee15bcfba6f0b
+	HASH:=f983a4c13f1a4bffd2dca0b741b77c5bf57d67549a674df5854e935b16e9cf93
 endef
 
 define Build/Prepare
 	$(call Build/Prepare/Default)
 
 	( \
-		cd $(PKG_BUILD_DIR)/src ; \
+		pushd $(PKG_BUILD_DIR)/src ; \
 		mkdir -p "chrome/build/pgo_profiles" ; \
 		$(CP) "$(DL_DIR)/$(PGO_FILE)" "chrome/build/pgo_profiles" ; \
 		mkdir -p "third_party/llvm-build/Release+Asserts" ; \
-		$(TAR) -xzf "$(DL_DIR)/$(CLANG_FILE)" -C "third_party/llvm-build/Release+Asserts" ; \
-		mkdir -p "gn/out" ; \
-		unzip -o "$(DL_DIR)/$(GN_FILE)" -d "gn/out" ; \
+		$(TAR) -xJf "$(DL_DIR)/$(CLANG_FILE)" -C "third_party/llvm-build/Release+Asserts" ; \
+		echo -e "llvmorg-$(CLANG_VER)" > "third_party/llvm-build/Release+Asserts/cr_build_revision" ; \
+		popd ; \
+	)
+endef
+
+define Build/Configure
+	( \
+		pushd "$(PKG_BUILD_DIR)/src" ; \
+		. ../init_env.sh "$(ARCH)" $(CPU_TYPE) $(CPU_SUBTYPE) "$(TOOLCHAIN_ROOT_DIR)" ; \
+		export naive_flags+=" $$$${naive_ccache_flags}" ; \
+		mkdir -p "out" ; \
+		gn gen "out/Release" --args="$$$${naive_flags}" --script-executable="$(PYTHON)" ; \
+		popd ; \
 	)
 endef
 
 define Build/Compile
-	( \
-		cd "$(PKG_BUILD_DIR)/src" ; \
-		. ../init_env.sh "$(ARCH)" $(CPU_TYPE) $(CPU_SUBTYPE) "$(TOOLCHAIN_DIR)" ; \
-		export naive_flags+=" $$$${naive_ccache_flags}" ; \
-		mkdir -p "out" ; \
-		./gn/out/gn gen "out/Release" --args="$$$${naive_flags}" --script-executable="$(PYTHON)" ; \
-	)
 	+$(NINJA) -C "$(PKG_BUILD_DIR)/src/out/Release" naive
 endef
 
@@ -121,7 +117,6 @@ define Package/naiveproxy/install
 endef
 
 $(eval $(call Download,CLANG))
-$(eval $(call Download,GN_TOOL))
 $(eval $(call Download,PGO_PROF))
 
 $(eval $(call BuildPackage,naiveproxy))

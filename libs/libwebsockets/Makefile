@@ -8,13 +8,13 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libwebsockets
-PKG_VERSION:=4.2.1
+PKG_VERSION:=4.5.8
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE_URL:=https://codeload.github.com/warmcat/libwebsockets/tar.gz/v$(PKG_VERSION)?
-PKG_HASH:=842da21f73ccba2be59e680de10a8cce7928313048750eb6ad73b6fa50763c51
+PKG_HASH:=b6ade658f4af3a823d0dc806ae5ef0623f0f4f5e2aeb895a0f77c4783840c30e
 
 PKG_SOURCE_VERSION:=v$(PKG_VERSION)
 
@@ -22,6 +22,9 @@ PKG_LICENSE:=MIT
 PKG_LICENSE_FILES:=LICENSE
 
 PKG_BUILD_DEPENDS:=libubox
+
+# GCC 15 workaround for discarded-qualifiers warning
+TARGET_CFLAGS += -Wno-error=discarded-qualifiers
 
 CMAKE_INSTALL:=1
 
@@ -45,10 +48,9 @@ define Package/libwebsockets/Default
 	SECTION:=libs
 	CATEGORY:=Libraries
 	TITLE:=libwebsockets
-	DEPENDS:=+zlib +libcap
+	DEPENDS:=+zlib +libcap +libubox
 	URL:=https://libwebsockets.org
 	MAINTAINER:=Karl Palsson <karlp@etactica.com>
-	PROVIDES:= libwebsockets
 endef
 
 define Package/libwebsockets-openssl
@@ -56,6 +58,7 @@ define Package/libwebsockets-openssl
 	TITLE += (OpenSSL)
 	DEPENDS += +libopenssl
 	VARIANT:=openssl
+	CONFLICTS:=libwebsockets-full
 endef
 
 define Package/libwebsockets-mbedtls
@@ -63,6 +66,8 @@ define Package/libwebsockets-mbedtls
 	TITLE += (mbedTLS)
 	DEPENDS += +libmbedtls
 	VARIANT:=mbedtls
+	PROVIDES:=libwebsockets
+	CONFLICTS:=libwebsockets-openssl
 endef
 
 define Package/libwebsockets-full
@@ -70,6 +75,7 @@ define Package/libwebsockets-full
 	TITLE += (Full - OpenSSL, libuv, plugins, CGI)
 	DEPENDS += +libopenssl +libuv
 	VARIANT:=full
+	PROVIDES:=libwebsockets libwebsockets-openssl
 endef
 
 ifeq ($(BUILD_VARIANT),openssl)
@@ -94,7 +100,7 @@ endif
 
 define Package/libwebsockets/install
 	$(INSTALL_DIR) $(1)/usr/lib
-	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libwebsockets.so* $(1)/usr/lib/
+	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libwebsockets*.so* $(1)/usr/lib/
 endef
 
 Package/libwebsockets-mbedtls/install = $(Package/libwebsockets/install)

@@ -8,14 +8,14 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libnetconf2
-PKG_VERSION:=1.1.43
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=3.7.10
+PKG_RELEASE:=2
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/CESNET/libnetconf2/tar.gz/v$(PKG_VERSION)?
-PKG_HASH:=66139fc9e68aa89c82235f4135dba9e44f5db663541279c14c74131e22b7f571
+PKG_HASH:=7146932ea4fc8e12b9152e23e18e46699174c531ef1e0fc351b05fcd12295a81
 
-PKG_MAINTAINER:=Jakov Smolic <jakov.smolic@sartura.hr>
+PKG_MAINTAINER:=Alexandru Ardelean <ardeleanalex@gmail.com>
 PKG_LICENSE:=BSD-3-Clause
 PKG_LICENSE_FILES:=LICENSE
 
@@ -24,12 +24,16 @@ CMAKE_INSTALL:=1
 include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/cmake.mk
 
+CMAKE_OPTIONS += \
+	-DCMAKE_DISABLE_FIND_PACKAGE_MbedTLS=ON \
+	-DENABLE_PAM=OFF
+
 define Package/libnetconf2
   SECTION:=libs
   CATEGORY:=Libraries
   TITLE:=NETCONF library
   URL:=https://github.com/CESNET/libnetconf2
-  DEPENDS:= +libyang +libssh +libopenssl +libpthread
+  DEPENDS:= +libyang +libcurl +libssh +libopenssl +libpthread
 endef
 
 define Package/libnetconf2/description

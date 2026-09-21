@@ -1,16 +1,18 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=pdns
-PKG_VERSION:=4.5.1
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=4.9.7
+PKG_RELEASE:=2
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
 PKG_SOURCE_URL:=https://downloads.powerdns.com/releases/
-PKG_HASH:=74d63c7aa0474de3c2137bb808164691a1a3a62942d2a9a70b648cd277923f9b
+PKG_HASH:=782875d210de20cee9f22f33ffc59ef1cdc6693c30efcb21f3ce8bf528fb09d4
 
-PKG_MAINTAINER:=Peter van Dijk <peter.van.dijk@powerdns.com>
-PKG_LICENCE:=GPL-2.0-only
-PKG_LICENCE_FILES:=COPYING
+PKG_MAINTAINER:=Peter van Dijk <peter.van.dijk@powerdns.com>, Remi Gacogne <remi.gacogne@powerdns.com>
+PKG_LICENSE:=GPL-2.0-only
+PKG_LICENSE_FILES:=COPYING
 PKG_CPE_ID:=cpe:/a:powerdns:authoritative
 
 PKG_FIXUP:=autoreconf
@@ -176,13 +178,13 @@ TARGET_CXX+=-std=c++17
 CONFIGURE_ARGS+= \
 	--sysconfdir=/etc/powerdns \
 	--libdir=/usr/lib/powerdns  \
+	--with-boost=$(STAGING_DIR)/usr/include \
 	--with-dynmodules="$(foreach backend,$(PDNS_BACKENDS),$(if $(CONFIG_PACKAGE_pdns-backend-$(backend)),$(PDNS_BACKEND_$(backend)_LIB),))" \
 	--with-lua="lua" \
-	--with-modules="bind random" \
+	--with-modules="bind" \
 	--with-mysql-lib=$(STAGING_DIR)/usr \
 	--with-mysql-includes=$(STAGING_DIR)/usr \
 	$(if $(CONFIG_PACKAGE_pdns-tools),--enable-tools,) \
-	--with-protobuf \
 	--without-libsodium \
 	--enable-experimental-pkcs11 \
 	--enable-lua-records \

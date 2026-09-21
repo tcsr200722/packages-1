@@ -1,15 +1,15 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=lmdb
-PKG_VERSION:=0.9.29
+PKG_VERSION:=0.9.35
 PKG_RELEASE:=1
 
-PKG_SOURCE:=LMDB_$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://codeload.github.com/LMDB/lmdb/tar.gz/LMDB_$(PKG_VERSION)?
-PKG_HASH:=22054926b426c66d8f2bc22071365df6e35f3aacf19ad943bc6167d4cae3bebb
-PKG_BUILD_DIR:=$(BUILD_DIR)/lmdb-LMDB_$(PKG_VERSION)
+PKG_SOURCE_PROTO:=git
+PKG_SOURCE_URL:=https://git.openldap.org/openldap/openldap.git
+PKG_SOURCE_VERSION:=LMDB_$(PKG_VERSION)
+PKG_MIRROR_HASH:=0196b429f21f06fa2a53666e20ae744932dbe08e58825d25e2663e8d306f7f44
 
-PKG_MAINTAINER:=Jan Pavlinec <jan.pavlinec1@gmail.com>
+PKG_MAINTAINER:=Alexandru Ardelean <ardeleanalex@gmail.com>
 PKG_LICENSE:=OLDAP-2.8
 PKG_LICENSE_FILES:=LICENSE
 

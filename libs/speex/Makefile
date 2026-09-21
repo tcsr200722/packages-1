@@ -8,15 +8,16 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=speex
-PKG_VERSION:=1.2.0
+PKG_VERSION:=1.2.1
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=http://downloads.us.xiph.org/releases/speex/
-PKG_HASH:=eaae8af0ac742dc7d542c9439ac72f1f385ce838392dc849cae4536af9210094
+PKG_SOURCE_URL:=https://downloads.xiph.org/releases/speex/
+PKG_HASH:=4b44d4f2b38a370a2d98a78329fefc56a0cf93d1c1be70029217baae6628feea
 
 PKG_FIXUP:=autoreconf
 PKG_INSTALL:=1
+PKG_BUILD_PARALLEL:=1
 
 PKG_CPE_ID:=cpe:/a:xiph:speex
 
@@ -26,7 +27,7 @@ define Package/libspeex
   SECTION:=libs
   CATEGORY:=Libraries
   TITLE:=Open source speech compression codec library
-  URL:=http://www.speex.org/
+  URL:=https://www.speex.org/
   MAINTAINER:=Peter Wagner <tripolar@gmx.at>
 endef
 

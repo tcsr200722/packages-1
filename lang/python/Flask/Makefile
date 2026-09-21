@@ -5,16 +5,19 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=Flask
-PKG_VERSION:=2.0.1
+PKG_VERSION:=3.1.3
 PKG_RELEASE:=1
 
-PYPI_NAME:=$(PKG_NAME)
-PKG_HASH:=1c4c257b1892aec1398784c63791cbaa43062f1f7aeb555c4da961b20ee68f55
+PYPI_NAME:=Flask
+PYPI_SOURCE_NAME:=flask
+PKG_HASH:=0ef0e52b8a9cd932855379197dd8f94047b359ca0a78695144304cb45f87c9eb
 
-PKG_MAINTAINER:=Daniel Golle <daniel@makrotopia.org>
+PKG_MAINTAINER:=Michal Vasilek <michal.vasilek@nic.cz>
 PKG_LICENSE:=BSD-3-Clause
 PKG_LICENSE_FILES:=LICENSE.rst
 PKG_CPE_ID:=cpe:/a:palletsprojects:flask
+
+PKG_BUILD_DEPENDS:=python-flit-core/host
 
 include ../pypi.mk
 include $(INCLUDE_DIR)/package.mk
@@ -26,10 +29,10 @@ define Package/python3-flask
   SUBMENU:=Python
   TITLE:=Flask
   URL:=https://palletsprojects.com/p/flask/
-  DEPENDS:=+python3-asyncio +python3-click +python3-codecs +python3-decimal \
-           +python3-itsdangerous +python3-jinja2 +python3 +python3-logging \
-           +python3-markupsafe +python3-multiprocessing +python3-setuptools \
-           +python3-werkzeug
+  DEPENDS:=+python3-asyncio +python3-blinker +python3-click +python3-codecs \
+           +python3-decimal +python3-itsdangerous +python3-jinja2 +python3 \
+           +python3-logging +python3-markupsafe +python3-multiprocessing \
+           +python3-setuptools +python3-werkzeug
 endef
 
 define Package/python3-flask/description

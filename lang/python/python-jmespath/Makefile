@@ -1,14 +1,15 @@
 include $(TOPDIR)/rules.mk
 
-PKG_NAME:=jmespath
-PKG_VERSION:=0.9.3
+PKG_NAME:=python-jmespath
+PKG_VERSION:=1.1.0
 PKG_RELEASE:=2
 
-PYPI_NAME:=$(PKG_NAME)
-PKG_HASH:=6a81d4c9aa62caf061cb517b4d9ad1dd300374cd4706997aff9cd6aedd61fc64
+PYPI_NAME:=jmespath
+PKG_HASH:=472c87d80f36026ae83c6ddd0f1d05d4e510134ed462851fd5f754c8c3cbb88d
 
-PKG_MAINTAINER:=Daniel Danzberger <daniel@dd-wrt.com>
+PKG_MAINTAINER:=Alexandru Ardelean <ardeleanalex@gmail.com>
 PKG_LICENSE:=MIT
+PKG_LICENSE_FILES:=LICENSE.txt
 
 include ../pypi.mk
 include $(INCLUDE_DIR)/package.mk
@@ -18,14 +19,19 @@ define Package/python3-jmespath
   SUBMENU:=Python
   SECTION:=lang
   CATEGORY:=Languages
-  TITLE:=jmespath
+  TITLE:=JSON Matching Expressions
   URL:=https://github.com/jmespath/jmespath.py
-  DEPENDS:=+python3
+  DEPENDS:=+python3-light
 endef
 
 define Package/python3-jmespath/description
-  JMESPath (pronounced “james path”) allows you to declaratively specify how to extract
-  elements from a JSON document.
+JMESPath (pronounced “james path”) allows you to declaratively specify
+how to extract elements from a JSON document.
+endef
+
+define Py3Package/python3-jmespath/install
+	$(INSTALL_DIR) $(1)/usr/bin
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/bin/jp.py $(1)/usr/bin/jp
 endef
 
 $(eval $(call Py3Package,python3-jmespath))

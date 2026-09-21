@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=sed
-PKG_VERSION:=4.8
-PKG_RELEASE:=3
+PKG_VERSION:=4.10
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
 PKG_SOURCE_URL:=@GNU/sed
-PKG_HASH:=f79b0cfea71b37a8eeec8490db6c5f7ae7719c35587f21edb0617f370eeff633
+PKG_HASH:=b8e72182b2ec96a3574e2998c47b7aaa64cc20ce000d8e9ac313cc07cecf28c7
 
 PKG_MAINTAINER:=Russell Senior <russell@personaltelco.net>
 PKG_LICENSE:=GPL-3.0-or-later
@@ -29,7 +29,6 @@ define Package/sed
   SECTION:=utils
   CATEGORY:=Utilities
   TITLE:=sed stream editor utility - full version
-  DEPENDS:=+libpcre
   URL:=https://www.gnu.org/software/sed/
   ALTERNATIVES:=300:/bin/sed:/usr/libexec/sed-gnu
 endef
@@ -44,7 +43,13 @@ endef
 
 CONFIGURE_ARGS += \
 	--disable-acl \
+	--disable-xattr \
 	--without-selinux
+
+define Build/Compile
+	sed -i 's/SUBDIRS = po . gnulib-tests/SUBDIRS = po ./' $(PKG_BUILD_DIR)/Makefile
+	$(call Build/Compile/Default,)
+endef
 
 define Package/sed/install
 	$(INSTALL_DIR) $(1)/usr/libexec

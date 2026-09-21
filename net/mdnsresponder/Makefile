@@ -8,17 +8,17 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=mDNSResponder
-PKG_VERSION:=IETF104
-PKG_RELEASE:=4
+PKG_VERSION:=2881.0.25
+PKG_RELEASE:=1
 
-PKG_SOURCE:=mDNSResponder-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://opensource.apple.com/tarballs/mDNSResponder/IETF/
-PKG_HASH:=b3a76fd35cf2d561546c2fbeaea1e5998b7e04b8330afb918ea5fbdeb202162c
-PKG_MAINTAINER:=
+PKG_SOURCE_PROTO:=git
+PKG_SOURCE_VERSION:=$(PKG_NAME)-$(PKG_VERSION)
+PKG_SOURCE_URL:=https://github.com/apple-oss-distributions/mDNSResponder
+PKG_MIRROR_HASH:=876c5f449c6cca11febaab26abb53b1ffa2846f2af3e36b4e15efb116c9b83fa
+
+PKG_MAINTAINER:=Alexandru Ardelean <ardeleanalex@gmail.com>
 PKG_LICENSE:=Apache-2.0
 PKG_CPE_ID:=cpe:/a:apple:mdnsresponder
-
-PKG_BUILD_DIR:=$(BUILD_DIR)/mDNSResponder-$(PKG_VERSION)
 
 PKG_BUILD_PARALLEL:=0
 PKG_INSTALL:=1
@@ -33,7 +33,7 @@ define Package/mDNSResponder/Default
   CATEGORY:=Network
   SUBMENU:=IP Addresses and Names
   TITLE:=mDNS
-  URL:=http://developer.apple.com/networking/bonjour/
+  URL:=https://developer.apple.com/bonjour/
 endef
 
 define Package/mDNSResponder/Default/description
@@ -54,7 +54,6 @@ $(call Package/mDNSResponder/Default/description)
  This package contains mDNS client utilities:
  - dns-sd
  - mDNSClient
- - mDNSIdentify
  - mDNSNetMonitor
  - mDNSProxyResponder
  - mDNSResponder
@@ -87,7 +86,7 @@ endef
 # not found:
 MAKE_FLAGS += \
 	LD="$(TARGET_CC)"  \
-	CFLAGS_DEBUG="$(TARGET_CFLAGS) $(TARGET_CPPFLAGS)" \
+	CFLAGS_DEBUG="$(TARGET_CFLAGS) $(TARGET_CPPFLAGS) -DMDNS_VERSIONSTR_NODTS=1" \
 	LINKOPTS=-lc \
 	LDCONFIG= \
 	ETCBASE="$(PKG_INSTALL_DIR)/etc" \
@@ -96,6 +95,7 @@ MAKE_FLAGS += \
 	MANPATH="$(PKG_INSTALL_DIR)/usr/man" \
 	STARTUPSCRIPTDIR="$(PKG_INSTALL_DIR)/etc/init.d" \
 	RUNLEVELSCRIPTSDIR="$(PKG_INSTALL_DIR)/etc/rc.d" \
+	tls=no \
 	os=linux-uclibc
 MAKE_PATH = mDNSPosix
 
@@ -132,7 +132,6 @@ define Package/mdns-utils/install
 	$(INSTALL_DIR) $(1)/usr/bin/
 	$(CP) $(PKG_INSTALL_DIR)/usr/bin/dns-sd $(1)/usr/bin/
 	$(CP) $(PKG_BUILD_DIR)/mDNSPosix/build/prod/mDNSClientPosix $(1)/usr/bin/mDNSClient
-	$(CP) $(PKG_BUILD_DIR)/mDNSPosix/build/prod/mDNSIdentify $(1)/usr/bin/mDNSIdentify
 	$(CP) $(PKG_BUILD_DIR)/mDNSPosix/build/prod/mDNSNetMonitor $(1)/usr/bin/mDNSNetMonitor
 	$(CP) $(PKG_BUILD_DIR)/mDNSPosix/build/prod/mDNSProxyResponderPosix $(1)/usr/bin/mDNSProxyResponder
 	$(CP) $(PKG_BUILD_DIR)/mDNSPosix/build/prod/mDNSResponderPosix $(1)/usr/bin/mDNSResponder

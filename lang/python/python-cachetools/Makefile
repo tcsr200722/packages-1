@@ -8,15 +8,17 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=python-cachetools
-PKG_VERSION:=3.1.1
-PKG_RELEASE:=2
+PKG_VERSION:=7.0.5
+PKG_RELEASE:=1
 
 PYPI_NAME:=cachetools
-PKG_HASH:=8ea2d3ce97850f31e4a08b0e2b5e6c34997d7216a9d2c98e0f3978630d4da69a
+PKG_HASH:=0cd042c24377200c1dcd225f8b7b12b0ca53cc2c961b43757e774ebe190fd990
 
-PKG_MAINTAINER:=Josef Schlehofer <josef.schlehofer@nic.cz>
+PKG_MAINTAINER:=Josef Schlehofer <pepe.schlehofer@gmail.com>
 PKG_LICENSE:=MIT
 PKG_LICENSE_FILES:=LICENSE
+
+PKG_BUILD_DEPENDS:=python-setuptools/host
 
 include ../pypi.mk
 include $(INCLUDE_DIR)/package.mk
@@ -32,7 +34,9 @@ define Package/python3-cachetools
 endef
 
 define Package/python3-cachetools/description
-  This module provides various memoizing collections and decorators, including variants of the Python 3 Standard Library lru_cache function decorator.
+This module provides various memoizing collections and decorators,
+including variants of the Python 3 Standard Library's @lru_cache
+function decorator.
 endef
 
 $(eval $(call Py3Package,python3-cachetools))
